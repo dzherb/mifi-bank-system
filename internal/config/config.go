@@ -42,7 +42,6 @@ func loadDotenv() {
 	log.Warn("no .env file found")
 }
 
-// Simple helper function to read an environment or return a default value
 func envOrDefault(key string, defaultVal string) string {
 	if value, ok := os.LookupEnv(key); ok {
 		return value

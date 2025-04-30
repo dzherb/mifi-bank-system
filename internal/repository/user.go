@@ -21,29 +21,29 @@ func NewUserRepository(tx pgx.Tx) UserRepository {
 	}
 }
 
-func (u *UserRepositoryImpl) Get(id int) (models.User, error) {
-	row := u.db.QueryRow(
+func (ur *UserRepositoryImpl) Get(id int) (models.User, error) {
+	row := ur.db.QueryRow(
 		context.Background(),
 		`SELECT id, email, username, password, created_at, updated_at
 		 FROM users 
 		 WHERE id = $1;`,
 		id,
 	)
-	return u.fromRow(row)
+	return ur.fromRow(row)
 }
 
-func (u *UserRepositoryImpl) Create(user models.User) (models.User, error) {
-	row := u.db.QueryRow(
+func (ur *UserRepositoryImpl) Create(user models.User) (models.User, error) {
+	row := ur.db.QueryRow(
 		context.Background(),
 		`INSERT INTO users (email, username, password) 
 		 VALUES ($1, $2, $3) 
     	 RETURNING id, email, username, password, created_at, updated_at;`,
 		user.Email, user.Username, user.Password,
 	)
-	return u.fromRow(row)
+	return ur.fromRow(row)
 }
 
-func (u *UserRepositoryImpl) fromRow(row pgx.Row) (models.User, error) {
+func (ur *UserRepositoryImpl) fromRow(row pgx.Row) (models.User, error) {
 	user := models.User{}
 	err := row.Scan(
 		&user.ID,

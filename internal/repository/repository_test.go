@@ -39,11 +39,13 @@ func TestUserRepositoryImpl_Create(t *testing.T) {
 	now := time.Now().Add(-time.Second * 10)
 
 	ur := NewUserRepository(tx)
-	user, err := ur.Create(models.User{
+
+	userToCreate := models.User{
 		Email:    "test@test.com",
 		Username: "test",
 		Password: "test_pass",
-	})
+	}
+	user, err := ur.Create(userToCreate)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,16 +53,50 @@ func TestUserRepositoryImpl_Create(t *testing.T) {
 	if user.ID == 0 {
 		t.Error("user ID is zero")
 	}
-	if user.Username != "test" {
-		t.Errorf("expected username %q, got %q", user.Username, "test")
+	if user.Email != userToCreate.Email {
+		t.Errorf("expected email %q, got %q", userToCreate.Email, user.Email)
 	}
-	if user.Password != "test_pass" {
-		t.Errorf("expected password %q, got %q", user.Password, "test")
+	if user.Username != userToCreate.Username {
+		t.Errorf("expected username %q, got %q", userToCreate.Username, user.Username)
+	}
+	if user.Password != userToCreate.Password {
+		t.Errorf("expected password %q, got %q", userToCreate.Password, user.Password)
 	}
 	if user.CreatedAt.Before(now) {
 		t.Errorf("created_at %s is earlier than expected", user.CreatedAt)
 	}
 	if user.UpdatedAt.Before(now) {
 		t.Errorf("updated_at %s is earlier than expected", user.UpdatedAt)
+	}
+}
+
+func TestUserRepositoryImpl_Get(t *testing.T) {
+	tx, err := storage.Pool().Begin(context.Background())
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	defer tx.Rollback(context.Background())
+
+	ur := NewUserRepository(tx)
+
+	user := models.User{
+		Email:    "test@test.com",
+		Username: "test",
+		Password: "test_pass",
+	}
+	created, err := ur.Create(user)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := ur.Get(created.ID)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if got != created {
+		t.Errorf("expected user %+v, got %+v", created, got)
 	}
 }

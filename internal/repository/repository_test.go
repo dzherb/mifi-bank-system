@@ -16,7 +16,13 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	code := storage.WithTempDB(cfg, func() int {
+
+	_, err = storage.InitDP(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	code := storage.WithTempDB(func() int {
 		return storage.WithMigratedDB(m.Run)
 	})
 	os.Exit(code)

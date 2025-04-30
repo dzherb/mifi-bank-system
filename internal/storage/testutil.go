@@ -2,9 +2,8 @@ package storage
 
 import (
 	"context"
-	"github.com/dzherb/mifi-bank-system/internal/config"
+	"errors"
 	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/google/uuid"
@@ -22,13 +21,7 @@ import (
 // switches the connection pool to use it, runs the tests, and then drops the temp database.
 //
 // Returns the exit code from testRunner or 1 on setup/cleanup failure.
-func WithTempDB(cfg *config.Config, testRunner func() int) int {
-	_, err := InitDP(cfg)
-	if err != nil {
-		log.Error(err)
-		return 1
-	}
-
+func WithTempDB(testRunner func() int) int {
 	tm := testDBManager{}
 
 	name, err := tm.initTestDB()
@@ -50,42 +43,14 @@ func WithTempDB(cfg *config.Config, testRunner func() int) int {
 	return testRunner()
 }
 
-// WithMigratedDB sets up and runs database migrations before executing the provided test runner.
+// WithMigratedDB applies all up migrations, runs the provided test runner,
+// and then rolls back all migrations.
 //
-// It establishes a database connection using the pgx connection pool, initializes the migration driver,
-// applies all up migrations using golang-migrate, and then executes the given test runner.
-//
-// If any step fails (connection, migration, etc.), it logs the error and returns exit code 1.
+// If any step fails, the error is logged and the function returns exit code 1.
 //
 // Returns the exit code from the test runner (typically passed to os.Exit).
 func WithMigratedDB(testRunner func() int) int {
-	db := stdlib.OpenDBFromPool(Pool())
-	driver, err := postgres.WithInstance(db, &postgres.Config{})
-	if err != nil {
-		log.Error(err)
-		return 1
-	}
-
-	defer func(driver database.Driver) {
-		err = driver.Close()
-		if err != nil {
-			log.Error(err)
-		}
-	}(driver)
-
-	// Compute path relative to this file (always resolves to `.../storage/migrations`)
-	_, currentFile, _, ok := runtime.Caller(0)
-	if !ok {
-		log.Error("unable to determine current file path")
-		return 1
-	}
-	migrationsPath := "file://" + filepath.Join(filepath.Dir(currentFile), "migrations")
-
-	m, err := migrate.NewWithDatabaseInstance(
-		migrationsPath,
-		Pool().Config().ConnConfig.Database,
-		driver,
-	)
+	m, err := migrator()
 	if err != nil {
 		log.Error(err)
 		return 1
@@ -95,7 +60,42 @@ func WithMigratedDB(testRunner func() int) int {
 		log.Error(err)
 		return 1
 	}
+	defer func(m *migrate.Migrate) {
+		err = m.Down()
+		if err != nil {
+			log.Error(err)
+		}
+		err, err2 := m.Close()
+		if err != nil {
+			log.Error(err)
+		}
+		if err2 != nil {
+			log.Error(err2)
+		}
+	}(m)
 	return testRunner()
+}
+
+func migrator() (*migrate.Migrate, error) {
+	db := stdlib.OpenDBFromPool(Pool())
+
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		return nil, err
+	}
+
+	// Compute path relative to this file (resolves to `.../storage/migrations`)
+	_, currentFile, _, ok := runtime.Caller(0)
+	if !ok {
+		return nil, errors.New("unable to determine current file path")
+	}
+	migrationsPath := "file://" + filepath.Join(filepath.Dir(currentFile), "migrations")
+
+	return migrate.NewWithDatabaseInstance(
+		migrationsPath,
+		Pool().Config().ConnConfig.Database,
+		driver,
+	)
 }
 
 type testDBManager struct {

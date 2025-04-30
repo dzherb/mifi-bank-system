@@ -14,7 +14,13 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	code := WithTempDB(cfg, m.Run)
+
+	_, err = InitDP(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	code := WithTempDB(m.Run)
 	os.Exit(code)
 }
 

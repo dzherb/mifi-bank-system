@@ -10,12 +10,9 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	cfg, err := config.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
+	cfg := config.Load()
 
-	_, err = InitDP(cfg)
+	_, err := Init(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}

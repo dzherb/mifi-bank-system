@@ -9,6 +9,7 @@ import (
 type AccountRepository interface {
 	Get(id int) (models.Account, error)
 	Create(account models.Account) (models.Account, error)
+	Update(account models.Account) (models.Account, error)
 }
 
 type AccountRepositoryImpl struct {
@@ -37,6 +38,18 @@ func (ar *AccountRepositoryImpl) Create(account models.Account) (models.Account,
 		 VALUES ($1) 
     	 RETURNING id, user_id, balance, created_at, updated_at;`,
 		account.UserID,
+	)
+	return ar.fromRow(row)
+}
+
+func (ar *AccountRepositoryImpl) Update(account models.Account) (models.Account, error) {
+	row := ar.db.QueryRow(
+		context.Background(),
+		`UPDATE accounts 
+			SET balance = $2 
+			WHERE id = $1 
+			RETURNING id, user_id, balance, created_at, updated_at;`,
+		account.ID, account.Balance,
 	)
 	return ar.fromRow(row)
 }

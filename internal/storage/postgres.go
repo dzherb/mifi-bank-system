@@ -10,7 +10,7 @@ import (
 
 var pool *pgxpool.Pool
 
-func InitDP(cfg *config.Config) (func(), error) {
+func Init(cfg *config.Config) (func(), error) {
 	var err error
 
 	pgxCfg, err := pgxpool.ParseConfig(cfg.PostgresURL)

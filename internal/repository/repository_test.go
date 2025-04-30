@@ -5,6 +5,7 @@ import (
 	"github.com/dzherb/mifi-bank-system/internal/models"
 	"github.com/dzherb/mifi-bank-system/internal/storage"
 	"github.com/jackc/pgx/v5"
+	"github.com/shopspring/decimal"
 	"log"
 	"os"
 	"reflect"
@@ -13,12 +14,9 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	cfg, err := config.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
+	cfg := config.Load()
 
-	_, err = storage.InitDP(cfg)
+	_, err := storage.Init(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -185,6 +183,39 @@ func TestAccountRepositoryImpl_Get(t *testing.T) {
 
 		if !reflect.DeepEqual(got, created) {
 			t.Errorf("expected account %+v, got %+v", created, got)
+		}
+	})
+}
+
+func TestAccountRepositoryImpl_Update(t *testing.T) {
+	storage.WithTransaction(t, func(tx pgx.Tx) {
+		ar := NewAccountRepository(tx)
+		ur := NewUserRepository(tx)
+
+		user, err := ur.Create(testUser())
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		created, err := ar.Create(models.Account{
+			UserID: user.ID,
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		updated := models.Account{
+			ID:      created.ID,
+			Balance: created.Balance.Add(decimal.NewFromInt(100)),
+		}
+
+		updated, err = ar.Update(updated)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if !updated.Balance.Equal(decimal.NewFromInt(100)) {
+			t.Errorf("expected balance to be 100, got %v", updated.Balance)
 		}
 	})
 }

@@ -9,6 +9,7 @@ import (
 type UserRepository interface {
 	Get(id int) (models.User, error)
 	Create(user models.User) (models.User, error)
+	Authenticate(email, password string) (models.User, error)
 }
 
 type UserRepositoryImpl struct {
@@ -39,6 +40,17 @@ func (ur *UserRepositoryImpl) Create(user models.User) (models.User, error) {
 		 VALUES ($1, $2, crypt($3, gen_salt('bf'))) 
     	 RETURNING id, email, username, password_hash, created_at, updated_at;`,
 		user.Email, user.Username, user.Password,
+	)
+	return ur.fromRow(row)
+}
+
+func (ur *UserRepositoryImpl) Authenticate(email, password string) (models.User, error) {
+	row := ur.db.QueryRow(
+		context.Background(),
+		`SELECT id, email, username, password_hash, created_at, updated_at
+			FROM users
+			WHERE email = $1 AND crypt($2, password_hash) = password_hash;`,
+		email, password,
 	)
 	return ur.fromRow(row)
 }

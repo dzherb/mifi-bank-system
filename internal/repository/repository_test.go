@@ -68,6 +68,41 @@ func TestUserRepositoryImpl_Create(t *testing.T) {
 	})
 }
 
+func TestUserRepositoryImpl_Authenticate(t *testing.T) {
+	storage.WithTransaction(t, func(tx pgx.Tx) {
+		ur := NewUserRepository(tx)
+		created, err := ur.Create(testUser())
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		got, err := ur.Authenticate(created.Email, "test_pass")
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		if got != created {
+			t.Errorf("expected user to be %v, got %v", created, got)
+		}
+	})
+}
+
+func TestUserRepositoryImpl_Authenticate2(t *testing.T) {
+	storage.WithTransaction(t, func(tx pgx.Tx) {
+		ur := NewUserRepository(tx)
+		created, err := ur.Create(testUser())
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		_, err = ur.Authenticate(created.Email, "wrong_pass")
+		if err == nil {
+			t.Error("expected error")
+		}
+	})
+}
+
 func TestUserRepositoryImpl_Get(t *testing.T) {
 	storage.WithTransaction(t, func(tx pgx.Tx) {
 		ur := NewUserRepository(tx)

@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"context"
 	"github.com/dzherb/mifi-bank-system/internal/config"
 	"github.com/dzherb/mifi-bank-system/internal/models"
 	"github.com/dzherb/mifi-bank-system/internal/storage"
@@ -29,85 +28,101 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestUserRepositoryImpl_Create(t *testing.T) {
-	tx, err := storage.Pool().Begin(context.Background())
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	defer func(tx pgx.Tx, ctx context.Context) {
-		err = tx.Rollback(ctx)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}(tx, context.Background())
-
-	now := time.Now().Add(-time.Second * 10)
-
-	ur := NewUserRepository(tx)
-
-	userToCreate := models.User{
+func testUser() models.User {
+	return models.User{
 		Email:    "test@test.com",
 		Username: "test",
 		Password: "test_pass",
-	}
-	user, err := ur.Create(userToCreate)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if user.ID == 0 {
-		t.Error("user ID is zero")
-	}
-	if user.Email != userToCreate.Email {
-		t.Errorf("expected email %q, got %q", userToCreate.Email, user.Email)
-	}
-	if user.Username != userToCreate.Username {
-		t.Errorf("expected username %q, got %q", userToCreate.Username, user.Username)
-	}
-	if user.Password != userToCreate.Password {
-		t.Errorf("expected password %q, got %q", userToCreate.Password, user.Password)
-	}
-	if user.CreatedAt.Before(now) {
-		t.Errorf("created_at %s is earlier than expected", user.CreatedAt)
-	}
-	if user.UpdatedAt.Before(now) {
-		t.Errorf("updated_at %s is earlier than expected", user.UpdatedAt)
 	}
 }
 
-func TestUserRepositoryImpl_Get(t *testing.T) {
-	tx, err := storage.Pool().Begin(context.Background())
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	defer func(tx pgx.Tx, ctx context.Context) {
-		err = tx.Rollback(ctx)
+func TestUserRepositoryImpl_Create(t *testing.T) {
+	storage.WithTransaction(t, func(tx pgx.Tx) {
+		now := time.Now().Add(-time.Second * 10)
+		ur := NewUserRepository(tx)
+
+		userToCreate := testUser()
+		user, err := ur.Create(userToCreate)
 		if err != nil {
-			log.Fatal(err)
+			t.Fatal(err)
 		}
-	}(tx, context.Background())
 
-	ur := NewUserRepository(tx)
+		if user.ID == 0 {
+			t.Error("user ID is zero")
+		}
+		if user.Email != userToCreate.Email {
+			t.Errorf("expected email %q, got %q", userToCreate.Email, user.Email)
+		}
+		if user.Username != userToCreate.Username {
+			t.Errorf("expected username %q, got %q", userToCreate.Username, user.Username)
+		}
+		if user.Password != userToCreate.Password {
+			t.Errorf("expected password %q, got %q", userToCreate.Password, user.Password)
+		}
+		if user.CreatedAt.Before(now) {
+			t.Errorf("created_at %s is earlier than expected", user.CreatedAt)
+		}
+		if user.UpdatedAt.Before(now) {
+			t.Errorf("updated_at %s is earlier than expected", user.UpdatedAt)
+		}
+	})
+}
 
-	user := models.User{
-		Email:    "test@test.com",
-		Username: "test",
-		Password: "test_pass",
-	}
-	created, err := ur.Create(user)
-	if err != nil {
-		t.Fatal(err)
-	}
+func TestUserRepositoryImpl_Get(t *testing.T) {
+	storage.WithTransaction(t, func(tx pgx.Tx) {
+		ur := NewUserRepository(tx)
 
-	got, err := ur.Get(created.ID)
+		created, err := ur.Create(testUser())
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	if err != nil {
-		t.Fatal(err)
-	}
+		got, err := ur.Get(created.ID)
 
-	if got != created {
-		t.Errorf("expected user %+v, got %+v", created, got)
-	}
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if got != created {
+			t.Errorf("expected user %+v, got %+v", created, got)
+		}
+	})
+
+}
+
+func TestAccountRepositoryImpl_Create(t *testing.T) {
+	storage.WithTransaction(t, func(tx pgx.Tx) {
+		now := time.Now().Add(-time.Second * 10)
+		ar := NewAccountRepository(tx)
+		ur := NewUserRepository(tx)
+
+		user, err := ur.Create(testUser())
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		accountToCreate := models.Account{
+			UserID: user.ID,
+		}
+		account, err := ar.Create(accountToCreate)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if account.ID == 0 {
+			t.Error("account ID is zero")
+		}
+		if account.UserID != user.ID {
+			t.Errorf("expected user ID %d, got %d", user.ID, account.UserID)
+		}
+		if !account.Balance.IsZero() {
+			t.Errorf("expected balance 0, got %q", account.Balance)
+		}
+		if account.CreatedAt.Before(now) {
+			t.Errorf("created_at %s is earlier than expected", account.CreatedAt)
+		}
+		if account.UpdatedAt.Before(now) {
+			t.Errorf("updated_at %s is earlier than expected", account.UpdatedAt)
+		}
+	})
 }

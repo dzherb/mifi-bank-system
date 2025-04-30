@@ -7,6 +7,7 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	log "github.com/sirupsen/logrus"
@@ -73,6 +74,23 @@ func WithMigratedDB(testRunner func() int) int {
 		}
 	}(m)
 	return testRunner()
+}
+
+// WithTransaction runs the test function within a rolled-back transaction.
+// Fails the test immediately if beginning or rolling back the transaction fails.
+func WithTransaction(log interface{ Fatal(args ...any) }, test func(tx pgx.Tx)) {
+	tx, err := Pool().Begin(context.Background())
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	defer func(tx pgx.Tx, ctx context.Context) {
+		err = tx.Rollback(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(tx, context.Background())
+	test(tx)
 }
 
 func migrator() (*migrate.Migrate, error) {

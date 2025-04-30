@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"log"
 	"os"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -136,10 +137,9 @@ func TestAccountRepositoryImpl_Create(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		accountToCreate := models.Account{
+		account, err := ar.Create(models.Account{
 			UserID: user.ID,
-		}
-		account, err := ar.Create(accountToCreate)
+		})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -158,6 +158,33 @@ func TestAccountRepositoryImpl_Create(t *testing.T) {
 		}
 		if account.UpdatedAt.Before(now) {
 			t.Errorf("updated_at %s is earlier than expected", account.UpdatedAt)
+		}
+	})
+}
+
+func TestAccountRepositoryImpl_Get(t *testing.T) {
+	storage.WithTransaction(t, func(tx pgx.Tx) {
+		ar := NewAccountRepository(tx)
+		ur := NewUserRepository(tx)
+		user, err := ur.Create(testUser())
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		created, err := ar.Create(models.Account{
+			UserID: user.ID,
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		got, err := ar.Get(created.ID)
+		if err != nil {
+			return
+		}
+
+		if !reflect.DeepEqual(got, created) {
+			t.Errorf("expected account %+v, got %+v", created, got)
 		}
 	})
 }

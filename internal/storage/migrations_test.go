@@ -28,7 +28,7 @@ func getMigrationRevisions() ([]uint, error) {
 		}
 	}
 
-	var revisions []uint
+	revisions := make([]uint, 0, len(revisionSet)/2)
 	for rev := range revisionSet {
 		revNum, _ := strconv.Atoi(rev)
 		revisions = append(revisions, uint(revNum))

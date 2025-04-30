@@ -5,6 +5,7 @@ import (
 	"github.com/dzherb/mifi-bank-system/internal/config"
 	"github.com/dzherb/mifi-bank-system/internal/models"
 	"github.com/dzherb/mifi-bank-system/internal/storage"
+	"github.com/jackc/pgx/v5"
 	"log"
 	"os"
 	"testing"
@@ -34,7 +35,12 @@ func TestUserRepositoryImpl_Create(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	defer tx.Rollback(context.Background())
+	defer func(tx pgx.Tx, ctx context.Context) {
+		err = tx.Rollback(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(tx, context.Background())
 
 	now := time.Now().Add(-time.Second * 10)
 
@@ -76,7 +82,12 @@ func TestUserRepositoryImpl_Get(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	defer tx.Rollback(context.Background())
+	defer func(tx pgx.Tx, ctx context.Context) {
+		err = tx.Rollback(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(tx, context.Background())
 
 	ur := NewUserRepository(tx)
 

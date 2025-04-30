@@ -9,6 +9,9 @@ import (
 	"time"
 )
 
+const writeTimeout = 15 * time.Second
+const readTimeout = 15 * time.Second
+
 func Start(cfg *config.Config) error {
 	r := mux.NewRouter()
 	RegisterRoutes(r)
@@ -18,8 +21,8 @@ func Start(cfg *config.Config) error {
 	srv := &http.Server{
 		Handler:      r,
 		Addr:         cfg.ServerHost + ":" + cfg.ServerPort,
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
+		WriteTimeout: writeTimeout,
+		ReadTimeout:  readTimeout,
 	}
 
 	log.Infof("starting the server on %s:%s", cfg.ServerHost, cfg.ServerPort)

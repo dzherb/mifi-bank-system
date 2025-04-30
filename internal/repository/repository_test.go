@@ -56,8 +56,8 @@ func TestUserRepositoryImpl_Create(t *testing.T) {
 		if user.Username != userToCreate.Username {
 			t.Errorf("expected username %q, got %q", userToCreate.Username, user.Username)
 		}
-		if user.Password != userToCreate.Password {
-			t.Errorf("expected password %q, got %q", userToCreate.Password, user.Password)
+		if user.Password == userToCreate.Password {
+			t.Errorf("expected password to be hashed")
 		}
 		if user.CreatedAt.Before(now) {
 			t.Errorf("created_at %s is earlier than expected", user.CreatedAt)

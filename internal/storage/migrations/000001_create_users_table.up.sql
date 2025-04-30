@@ -3,11 +3,11 @@ BEGIN;
 CREATE TABLE users
 (
     id         SERIAL PRIMARY KEY,
-    email      VARCHAR(32)                            NOT NULL,
-    username   VARCHAR(32)                            NOT NULL,
-    password   VARCHAR(32)                            NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+    email      VARCHAR(32)               NOT NULL,
+    username   VARCHAR(32)               NOT NULL,
+    password   VARCHAR(32)               NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 
 CREATE OR REPLACE FUNCTION set_updated_at()

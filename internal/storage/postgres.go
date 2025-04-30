@@ -3,6 +3,8 @@ package storage
 import (
 	"context"
 	"github.com/dzherb/mifi-bank-system/internal/config"
+	"github.com/jackc/pgx-shopspring-decimal"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -10,7 +12,16 @@ var pool *pgxpool.Pool
 
 func InitDP(cfg *config.Config) (func(), error) {
 	var err error
-	pool, err = pgxpool.New(context.Background(), cfg.PostgresURL)
+
+	pgxCfg, err := pgxpool.ParseConfig(cfg.PostgresURL)
+	if err != nil {
+		return nil, err
+	}
+
+	pgxCfg.AfterConnect = registerTypes
+
+	pool, err = pgxpool.NewWithConfig(context.Background(), pgxCfg)
+
 	if err != nil {
 		return nil, err
 	}
@@ -21,6 +32,11 @@ func InitDP(cfg *config.Config) (func(), error) {
 	}
 
 	return ClosePool, nil
+}
+
+func registerTypes(_ context.Context, conn *pgx.Conn) error {
+	decimal.Register(conn.TypeMap())
+	return nil
 }
 
 func Pool() *pgxpool.Pool {

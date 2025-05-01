@@ -33,7 +33,7 @@ func TestHealthHandler(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 
-	HealthHandler{}.ServeHTTP(rr, req)
+	HealthHandler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("expected status code %v, got %v",

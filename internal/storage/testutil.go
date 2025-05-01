@@ -3,6 +3,9 @@ package storage
 import (
 	"context"
 	"errors"
+	"path/filepath"
+	"runtime"
+
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -11,8 +14,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	log "github.com/sirupsen/logrus"
-	"path/filepath"
-	"runtime"
 )
 
 // WithTempDB sets up a temporary PostgreSQL database for testing.

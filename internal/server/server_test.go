@@ -3,10 +3,11 @@ package server_test
 import (
 	"context"
 	"errors"
-	"github.com/dzherb/mifi-bank-system/internal/config"
-	"github.com/dzherb/mifi-bank-system/internal/server"
 	"net/http"
 	"testing"
+
+	"github.com/dzherb/mifi-bank-system/internal/config"
+	"github.com/dzherb/mifi-bank-system/internal/server"
 )
 
 func TestServerStartAndShutdown(t *testing.T) {

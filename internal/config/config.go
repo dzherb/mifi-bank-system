@@ -2,11 +2,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
-	log "github.com/sirupsen/logrus"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/joho/godotenv"
+	log "github.com/sirupsen/logrus"
 )
 
 type Config struct {

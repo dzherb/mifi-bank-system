@@ -1,15 +1,16 @@
 package handlers_test
 
 import (
-	"github.com/dzherb/mifi-bank-system/internal/config"
-	"github.com/dzherb/mifi-bank-system/internal/handlers"
-	"github.com/dzherb/mifi-bank-system/internal/storage"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/dzherb/mifi-bank-system/internal/config"
+	"github.com/dzherb/mifi-bank-system/internal/handlers"
+	"github.com/dzherb/mifi-bank-system/internal/storage"
+	log "github.com/sirupsen/logrus"
 )
 
 func TestMain(m *testing.M) {

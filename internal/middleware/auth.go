@@ -3,10 +3,11 @@ package middleware
 import (
 	"context"
 	"fmt"
-	"github.com/dzherb/mifi-bank-system/internal/handlers"
-	"github.com/dzherb/mifi-bank-system/internal/security"
 	"net/http"
 	"strings"
+
+	"github.com/dzherb/mifi-bank-system/internal/handlers"
+	"github.com/dzherb/mifi-bank-system/internal/security"
 )
 
 type userIDCtxKey string

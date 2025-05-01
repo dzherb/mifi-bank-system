@@ -1,13 +1,14 @@
 package storage_test
 
 import (
-	"github.com/dzherb/mifi-bank-system/internal/storage"
-	"github.com/golang-migrate/migrate/v4"
 	"os"
 	"regexp"
 	"slices"
 	"strconv"
 	"testing"
+
+	"github.com/dzherb/mifi-bank-system/internal/storage"
+	"github.com/golang-migrate/migrate/v4"
 )
 
 func getMigrationRevisions() ([]uint, error) {

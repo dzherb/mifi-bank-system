@@ -1,14 +1,15 @@
 package middleware_test
 
 import (
-	"github.com/dzherb/mifi-bank-system/internal/config"
-	"github.com/dzherb/mifi-bank-system/internal/middleware"
-	"github.com/dzherb/mifi-bank-system/internal/security"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/dzherb/mifi-bank-system/internal/config"
+	"github.com/dzherb/mifi-bank-system/internal/middleware"
+	"github.com/dzherb/mifi-bank-system/internal/security"
 )
 
 var handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

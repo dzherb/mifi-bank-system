@@ -2,12 +2,13 @@ package server
 
 import (
 	"context"
+	"net/http"
+	"time"
+
 	"github.com/dzherb/mifi-bank-system/internal/config"
 	"github.com/dzherb/mifi-bank-system/internal/middleware"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"time"
 )
 
 const writeTimeout = 15 * time.Second

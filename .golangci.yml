@@ -67,6 +67,7 @@ formatters:
   enable:
     - gofmt
     - golines
+    - gci
   exclusions:
     generated: lax
     paths:

@@ -1,10 +1,11 @@
 package security
 
 import (
-	"github.com/dzherb/mifi-bank-system/internal/config"
-	"github.com/golang-jwt/jwt/v5"
 	"strconv"
 	"time"
+
+	"github.com/dzherb/mifi-bank-system/internal/config"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 var secretKey []byte

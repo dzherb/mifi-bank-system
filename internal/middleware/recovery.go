@@ -3,8 +3,9 @@ package middleware
 import (
 	"context"
 	"fmt"
-	"github.com/dzherb/mifi-bank-system/internal/handlers"
 	"net/http"
+
+	"github.com/dzherb/mifi-bank-system/internal/handlers"
 )
 
 type ctxKey string

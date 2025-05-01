@@ -1,17 +1,18 @@
 package repo_test
 
 import (
+	"log"
+	"os"
+	"reflect"
+	"testing"
+	"time"
+
 	"github.com/dzherb/mifi-bank-system/internal/config"
 	"github.com/dzherb/mifi-bank-system/internal/models"
 	"github.com/dzherb/mifi-bank-system/internal/repository"
 	"github.com/dzherb/mifi-bank-system/internal/storage"
 	"github.com/jackc/pgx/v5"
 	"github.com/shopspring/decimal"
-	"log"
-	"os"
-	"reflect"
-	"testing"
-	"time"
 )
 
 func TestMain(m *testing.M) {

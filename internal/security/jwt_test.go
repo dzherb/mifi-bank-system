@@ -1,13 +1,14 @@
 package security_test
 
 import (
-	"github.com/dzherb/mifi-bank-system/internal/config"
-	"github.com/dzherb/mifi-bank-system/internal/security"
-	"github.com/golang-jwt/jwt/v5"
 	"os"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/dzherb/mifi-bank-system/internal/config"
+	"github.com/dzherb/mifi-bank-system/internal/security"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type token struct {

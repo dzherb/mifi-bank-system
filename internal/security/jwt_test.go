@@ -1,6 +1,7 @@
 package security
 
 import (
+	"github.com/dzherb/mifi-bank-system/internal/config"
 	"github.com/golang-jwt/jwt/v5"
 	"os"
 	"strconv"
@@ -15,8 +16,10 @@ type token struct {
 }
 
 func TestMain(m *testing.M) {
-	secretKey = []byte("secret")
-	accessTokenTTL = time.Hour
+	Init(&config.Config{
+		SecretKey:      "secret",
+		AccessTokenTTL: time.Hour,
+	})
 
 	os.Exit(m.Run())
 }

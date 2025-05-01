@@ -1,0 +1,22 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: check-illegal-windows-names
+      - id: check-added-large-files
+  - repo: local
+    hooks:
+      - id: lint
+        name: lint
+        entry: make lint
+        language: system
+      - id: format
+        name: format
+        entry: make fmt
+        language: system
+      - id: test
+        name: test
+        entry: make test
+        language: system

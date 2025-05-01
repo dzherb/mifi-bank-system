@@ -1,4 +1,3 @@
-//coverage:ignore file
 package main
 
 import (
@@ -10,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func main() {
+func main() { // coverage-ignore
 	logger.Init()
 
 	cfg := config.Load()

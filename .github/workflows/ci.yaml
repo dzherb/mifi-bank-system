@@ -42,18 +42,29 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: "1.24.x"
-      - name: Install go-ignore-cov
-        run: go install github.com/quantumcycle/go-ignore-cov@latest
       - name: Run tests
         env:
           SECRET_KEY: not_secret
           DATABASE_URL: postgres://postgres:password@localhost:5432/test_db?sslmode=disable
-        run: make cover
-      - name: Get total coverage
-        run: |
-          go tool cover -func=cover.out | awk 'END { print "Total coverage: " $NF }' >> $GITHUB_STEP_SUMMARY
+        run: make test
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
         with:
           name: cover.out
           path: cover.out
+
+  coverage:
+    name: Check test coverage
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download coverage data
+        uses: actions/download-artifact@v4
+        with:
+          name: cover.out
+      - name: Check test coverage
+        uses: vladopajic/go-test-coverage@v2
+        with:
+          config: ./.testcoverage.yml
+          git-token: ${{ github.ref_name == 'main' && secrets.GITHUB_TOKEN || '' }}
+          git-branch: badges

@@ -1,0 +1,11 @@
+profile: cover.out
+
+threshold:
+  # Minimum coverage percentage required for individual files.
+  file: 50
+
+  # Minimum coverage percentage required for each package.
+  package: 60
+
+  # Minimum overall project coverage percentage required.
+  total: 70

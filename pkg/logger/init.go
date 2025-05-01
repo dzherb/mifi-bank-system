@@ -1,4 +1,3 @@
-//coverage:ignore file
 package logger
 
 import (
@@ -7,7 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func Init() {
+func Init() { // coverage-ignore
 	log.SetOutput(os.Stdout)
 
 	levelStr := os.Getenv("LOG_LEVEL")

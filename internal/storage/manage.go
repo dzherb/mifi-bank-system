@@ -16,7 +16,8 @@ func createDB(name, template string) error {
 	return err
 }
 
-func dropDB(name string) error {
+func dropDB(name string) error { // coverage-ignore
+	// (it's actually tested, but cover don't catch it...)
 	query := fmt.Sprintf(`DROP DATABASE "%s";`, name)
 	_, err := Pool().Exec(context.Background(), query)
 

@@ -67,16 +67,16 @@ func WithMigratedDB(testRunner func() int) int {
 
 	defer func(m *migrate.Migrate) {
 		err = m.Down()
-		if err != nil {
+		if err != nil { // coverage-ignore
 			log.Error(err)
 		}
 
 		err, err2 := m.Close()
-		if err != nil {
+		if err != nil { // coverage-ignore
 			log.Error(err)
 		}
 
-		if err2 != nil {
+		if err2 != nil { // coverage-ignore
 			log.Error(err2)
 		}
 	}(m)

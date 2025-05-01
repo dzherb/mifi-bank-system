@@ -11,7 +11,7 @@ import (
 
 type userIDCtxKey string
 
-const userIDKey userIDCtxKey = "userID"
+const UserIDKey userIDCtxKey = "userID"
 const TokenPrefix = "Bearer "
 
 func AuthRequired(next http.Handler) http.Handler {
@@ -30,7 +30,7 @@ func AuthRequired(next http.Handler) http.Handler {
 			handlers.WriteErrorResponse(w, err)
 		}
 
-		r = r.WithContext(context.WithValue(r.Context(), userIDKey, userID))
+		r = r.WithContext(context.WithValue(r.Context(), UserIDKey, userID))
 		next.ServeHTTP(w, r)
 	})
 }

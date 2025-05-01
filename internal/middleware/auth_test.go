@@ -1,7 +1,8 @@
-package middleware
+package middleware_test
 
 import (
 	"github.com/dzherb/mifi-bank-system/internal/config"
+	"github.com/dzherb/mifi-bank-system/internal/middleware"
 	"github.com/dzherb/mifi-bank-system/internal/security"
 	"net/http"
 	"net/http/httptest"
@@ -12,7 +13,7 @@ import (
 
 var handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	userID := r.Context().Value(userIDKey).(int)
+	userID := r.Context().Value(middleware.UserIDKey).(int)
 	w.Write([]byte(strconv.Itoa(userID))) //nolint:errcheck
 })
 
@@ -36,7 +37,7 @@ func TestAuthMiddlewareSuccess(t *testing.T) {
 	req.Header.Set("Authorization", "Bearer "+token)
 	rr := httptest.NewRecorder()
 
-	AuthRequired(handler).ServeHTTP(rr, req)
+	middleware.AuthRequired(handler).ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("got status %v, want %v", status, http.StatusOK)
@@ -54,7 +55,7 @@ func TestAuthMiddlewareFail(t *testing.T) {
 	req.Header.Set("Authorization", "Bearer fake_token")
 	rr := httptest.NewRecorder()
 
-	AuthRequired(handler).ServeHTTP(rr, req)
+	middleware.AuthRequired(handler).ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusUnauthorized {
 		t.Errorf("got status %v, want %v", status, http.StatusOK)

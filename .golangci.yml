@@ -11,17 +11,50 @@ linters:
     - nestif
     - tagalign
     - mnd
+    - gosec
+    - govet
+    - dupl
+    - errorlint
+    - exhaustive
+    - forbidigo
+    - funcorder
+    - funlen
+    - gocognit
+    - goconst
+    - gocritic
+    - godot
+    - godox
+    - govet
+    - iface
+    - lll
+    - nolintlint
+    - staticcheck
+    - tagalign
+    - testpackage
+    - usestdlibvars
+    - usetesting
+    - unconvert
+    - unconvert
+    - unused
+    - whitespace
   settings:
     misspell:
       locale: US
     revive:
       rules:
         - name: redundant-build-tag
+    gocognit:
+      min-complexity: 15
+    lll:
+      line-length: 100
   exclusions:
     generated: lax
     rules:
       - path: (.+)\.go$
         text: G104
+      - path: _test.go
+        linters:
+          - funlen
     paths:
       - third_party$
       - builtin$

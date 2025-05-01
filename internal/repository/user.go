@@ -1,4 +1,4 @@
-package repository
+package repo
 
 import (
 	"context"
@@ -26,8 +26,8 @@ func (ur *UserRepositoryImpl) Get(id int) (models.User, error) {
 	row := ur.db.QueryRow(
 		context.Background(),
 		`SELECT id, email, username, password_hash, created_at, updated_at
-		 FROM users 
-		 WHERE id = $1;`,
+		FROM users
+		WHERE id = $1;`,
 		id,
 	)
 	return ur.fromRow(row)
@@ -37,8 +37,8 @@ func (ur *UserRepositoryImpl) Create(user models.User) (models.User, error) {
 	row := ur.db.QueryRow(
 		context.Background(),
 		`INSERT INTO users (email, username, password_hash) 
-		 VALUES ($1, $2, crypt($3, gen_salt('bf'))) 
-    	 RETURNING id, email, username, password_hash, created_at, updated_at;`,
+		VALUES ($1, $2, crypt($3, gen_salt('bf')))
+		RETURNING id, email, username, password_hash, created_at, updated_at;`,
 		user.Email, user.Username, user.Password,
 	)
 	return ur.fromRow(row)
@@ -48,8 +48,8 @@ func (ur *UserRepositoryImpl) Authenticate(email, password string) (models.User,
 	row := ur.db.QueryRow(
 		context.Background(),
 		`SELECT id, email, username, password_hash, created_at, updated_at
-			FROM users
-			WHERE email = $1 AND crypt($2, password_hash) = password_hash;`,
+		FROM users
+		WHERE email = $1 AND crypt($2, password_hash) = password_hash;`,
 		email, password,
 	)
 	return ur.fromRow(row)

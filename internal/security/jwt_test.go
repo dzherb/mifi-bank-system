@@ -1,7 +1,8 @@
-package security
+package security_test
 
 import (
 	"github.com/dzherb/mifi-bank-system/internal/config"
+	"github.com/dzherb/mifi-bank-system/internal/security"
 	"github.com/golang-jwt/jwt/v5"
 	"os"
 	"strconv"
@@ -16,7 +17,7 @@ type token struct {
 }
 
 func TestMain(m *testing.M) {
-	Init(&config.Config{
+	security.Init(&config.Config{
 		SecretKey:      "secret",
 		AccessTokenTTL: time.Hour,
 	})
@@ -25,13 +26,13 @@ func TestMain(m *testing.M) {
 }
 
 func TestTokenIssue(t *testing.T) {
-	token, err := IssueAccessToken(23)
+	token, err := security.IssueAccessToken(23)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	userID, err := ValidateToken(token)
+	userID, err := security.ValidateToken(token)
 	if err != nil {
 		t.Error(err)
 		return
@@ -49,33 +50,33 @@ func TestTokenValidation(t *testing.T) {
 	}{
 		{
 			token: token{
-				iat: timeToFloat64(time.Now()),
+				iat: security.TimeToFloat64(time.Now()),
 				sub: "1",
-				exp: timeToFloat64(time.Now().Add(time.Second * 100)),
+				exp: security.TimeToFloat64(time.Now().Add(time.Second * 100)),
 			},
 			isValid: true,
 		},
 		{
 			token: token{
-				iat: timeToFloat64(time.Now()),
+				iat: security.TimeToFloat64(time.Now()),
 				sub: "1",
-				exp: timeToFloat64(time.Now().Add(-time.Second * 100)),
+				exp: security.TimeToFloat64(time.Now().Add(-time.Second * 100)),
 			},
 			isValid: false,
 		},
 		{
 			token: token{
-				iat: timeToFloat64(time.Now().Add(time.Second * 100)),
+				iat: security.TimeToFloat64(time.Now().Add(time.Second * 100)),
 				sub: "1",
-				exp: timeToFloat64(time.Now().Add(time.Second * 100)),
+				exp: security.TimeToFloat64(time.Now().Add(time.Second * 100)),
 			},
 			isValid: false,
 		},
 		{
 			token: token{
-				iat: timeToFloat64(time.Now()),
+				iat: security.TimeToFloat64(time.Now()),
 				sub: "not_a_number",
-				exp: timeToFloat64(time.Now().Add(time.Second * 100)),
+				exp: security.TimeToFloat64(time.Now().Add(time.Second * 100)),
 			},
 			isValid: false,
 		},
@@ -86,13 +87,13 @@ func TestTokenValidation(t *testing.T) {
 			"iat": c.token.iat,
 			"sub": c.token.sub,
 			"exp": c.token.exp,
-		}).SignedString(secretKey)
+		}).SignedString(security.SecretKey)
 
 		if err != nil {
 			t.Error(err)
 		}
 
-		userID, err := ValidateToken(tokenEncoded)
+		userID, err := security.ValidateToken(tokenEncoded)
 		if err != nil {
 			if c.isValid {
 				t.Error("unexpected error:", err)

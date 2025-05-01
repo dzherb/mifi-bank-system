@@ -1,7 +1,8 @@
-package handlers
+package handlers_test
 
 import (
 	"github.com/dzherb/mifi-bank-system/internal/config"
+	"github.com/dzherb/mifi-bank-system/internal/handlers"
 	"github.com/dzherb/mifi-bank-system/internal/storage"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -26,14 +27,14 @@ func TestMain(m *testing.M) {
 }
 
 func TestHealthHandler(t *testing.T) {
-	req, err := http.NewRequest("GET", "/health", nil)
+	req, err := http.NewRequest(http.MethodGet, "/health", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	rr := httptest.NewRecorder()
 
-	HealthHandler.ServeHTTP(rr, req)
+	handlers.HealthHandler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("expected status code %v, got %v",

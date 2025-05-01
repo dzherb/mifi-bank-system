@@ -1,16 +1,17 @@
-package server
+package server_test
 
 import (
 	"context"
 	"errors"
 	"github.com/dzherb/mifi-bank-system/internal/config"
+	"github.com/dzherb/mifi-bank-system/internal/server"
 	"net/http"
 	"testing"
 )
 
 func TestServerStartAndShutdown(t *testing.T) {
 	go func() {
-		err := Start(&config.Config{
+		err := server.Start(&config.Config{
 			ServerHost: "localhost",
 			ServerPort: "8080",
 		})
@@ -24,11 +25,11 @@ func TestServerStartAndShutdown(t *testing.T) {
 	}()
 
 	defer func(ctx context.Context) {
-		err := Shutdown(ctx)
+		err := server.Shutdown(ctx)
 		if err != nil {
 			t.Error(err)
 		}
-	}(context.Background())
+	}(t.Context())
 
 	resp, err := http.Get("http://localhost:8080/health")
 	if err != nil {

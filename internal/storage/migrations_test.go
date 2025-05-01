@@ -1,6 +1,7 @@
-package storage
+package storage_test
 
 import (
+	"github.com/dzherb/mifi-bank-system/internal/storage"
 	"github.com/golang-migrate/migrate/v4"
 	"os"
 	"regexp"
@@ -30,7 +31,7 @@ func getMigrationRevisions() ([]uint, error) {
 
 	revisions := make([]uint, 0, len(revisionSet)/2)
 	for rev := range revisionSet {
-		revNum, _ := strconv.Atoi(rev)
+		revNum, _ := strconv.ParseUint(rev, 10, 64)
 		revisions = append(revisions, uint(revNum))
 	}
 
@@ -49,7 +50,7 @@ func TestStairway(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	m, err := migrator()
+	m, err := storage.Migrator()
 	if err != nil {
 		t.Fatal(err)
 	}

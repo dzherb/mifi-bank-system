@@ -1,8 +1,8 @@
-package storage
+package storage_test
 
 import (
-	"context"
 	"github.com/dzherb/mifi-bank-system/internal/config"
+	"github.com/dzherb/mifi-bank-system/internal/storage"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"strings"
@@ -12,24 +12,24 @@ import (
 func TestMain(m *testing.M) {
 	cfg := config.Load()
 
-	_, err := Init(cfg)
+	_, err := storage.Init(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	code := WithTempDB(m.Run)
+	code := storage.WithTempDB(m.Run)
 	os.Exit(code)
 }
 
 func TestTempDB(t *testing.T) {
-	testPool := Pool()
+	testPool := storage.Pool()
 
 	dbName := testPool.Config().ConnConfig.Database
 	if !strings.Contains(dbName, ".go_test") {
 		t.Error("unexpected database name")
 	}
 
-	err := testPool.Ping(context.Background())
+	err := testPool.Ping(t.Context())
 	if err != nil {
 		t.Error(err)
 	}

@@ -21,8 +21,9 @@ func Start(cfg *config.Config) error {
 
 	r.Use(
 		middleware.LoggingMiddleware,
-		middleware.RecoveryMiddleware,
 		middleware.JSONMiddleware,
+		middleware.RecoveryMiddleware,
+		middleware.RateLimiter(),
 	)
 
 	srv = &http.Server{

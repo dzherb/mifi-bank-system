@@ -12,11 +12,13 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/shopspring/decimal v1.4.0
 	github.com/sirupsen/logrus v1.9.3
+	github.com/throttled/throttled/v2 v2.13.0
 )
 
 require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
+	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect

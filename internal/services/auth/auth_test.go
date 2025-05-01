@@ -66,3 +66,37 @@ func TestLogin(t *testing.T) {
 		}
 	})
 }
+
+func TestRegister(t *testing.T) {
+	storage.WithTransaction(t, func() {
+		as := auth.NewService()
+
+		res, err := as.Register("test@test.com", "user", "strongPass11")
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+			return
+		}
+
+		ur := repo.NewUserRepository()
+
+		userFromDB, err := ur.Get(res.User.ID)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+			return
+		}
+
+		if res.User != userFromDB {
+			t.Errorf("got user %v, want %v", userFromDB, res.User)
+		}
+
+		userID, err := security.ValidateToken(res.Token)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+			return
+		}
+
+		if res.User.ID != userID {
+			t.Errorf("got userID %v, want %v", userID, res.User.ID)
+		}
+	})
+}

@@ -9,4 +9,5 @@ type Card struct {
 	Expires   time.Time `json:"expires"`
 	CVV       string    `json:"cvv"`
 	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

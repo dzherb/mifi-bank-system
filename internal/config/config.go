@@ -12,7 +12,7 @@ import (
 type Config struct {
 	ServerHost     string
 	ServerPort     string
-	PostgresURL    string
+	DatabaseURL    string
 	SecretKey      string
 	AccessTokenTTL time.Duration
 }
@@ -23,7 +23,7 @@ func Load() *Config {
 	return &Config{
 		ServerHost:     envOrDefault("SERVER_HOST", "localhost"),
 		ServerPort:     envOrDefault("SERVER_PORT", "8080"),
-		PostgresURL:    envOrPanic("POSTGRES_URL"),
+		DatabaseURL:    envOrPanic("DATABASE_URL"),
 		SecretKey:      envOrPanic("SECRET_KEY"),
 		AccessTokenTTL: accessTokenTTL(),
 	}

@@ -13,7 +13,7 @@ var pool *pgxpool.Pool
 func Init(cfg *config.Config) (func(), error) {
 	var err error
 
-	pgxCfg, err := pgxpool.ParseConfig(cfg.PostgresURL)
+	pgxCfg, err := pgxpool.ParseConfig(cfg.DatabaseURL)
 	if err != nil {
 		return nil, err
 	}

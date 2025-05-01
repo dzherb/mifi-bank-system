@@ -45,5 +45,5 @@ jobs:
       - name: Run tests
         env:
           SECRET_KEY: not_secret
-          POSTGRES_URL: postgres://postgres:password@localhost:5432/test_db?sslmode=disable
+          DATABASE_URL: postgres://postgres:password@localhost:5432/test_db?sslmode=disable
         run: go test ./... -v

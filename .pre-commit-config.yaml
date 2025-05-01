@@ -12,11 +12,22 @@ repos:
         name: lint
         entry: make lint
         language: system
+        fail_fast: true
+        pass_filenames: false
+        require_serial: true
+
       - id: format
         name: format
         entry: make fmt
         language: system
+        fail_fast: true
+        pass_filenames: false
+        require_serial: true
+
       - id: test
         name: test
         entry: make test
         language: system
+        fail_fast: true
+        pass_filenames: false
+        require_serial: true

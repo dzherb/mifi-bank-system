@@ -4,7 +4,7 @@ test:
 	@go test ./... -count=1
 
 cover:
-	@./scripts/cover.sh
+	@./scripts/cover.sh $(ARGS)
 
 clean:
 	@rm -f cover.out

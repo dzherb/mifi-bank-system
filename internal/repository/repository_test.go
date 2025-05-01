@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -80,6 +81,44 @@ func TestUserRepositoryImpl_Create(t *testing.T) {
 			t.Errorf("updated_at %s is earlier than expected", user.UpdatedAt)
 		}
 	})
+}
+
+func TestUserConstraints(t *testing.T) {
+	firstUser := testUser()
+
+	users := []models.User{
+		{
+			Username: firstUser.Username,
+			Email:    "test2@test.com",
+			Password: "test_pass",
+		},
+		{
+			Username: "user2",
+			Email:    firstUser.Email,
+			Password: "test_pass",
+		},
+	}
+	for _, u := range users {
+		storage.WithTransaction(t, func() {
+			ur := repo.NewUserRepository()
+
+			_, err := ur.Create(firstUser)
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+				return
+			}
+
+			_, err = ur.Create(u)
+			if err == nil {
+				t.Error("expected error")
+				return
+			}
+
+			if !strings.Contains(err.Error(), "unique constraint") {
+				t.Errorf("expected unique constraint error, got: %v", err)
+			}
+		})
+	}
 }
 
 func TestUserRepositoryImpl_Authenticate(t *testing.T) {

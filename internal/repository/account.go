@@ -26,7 +26,7 @@ func (ar *AccountRepositoryImpl) Get(id int) (models.Account, error) {
 	row := ar.db.QueryRow(
 		context.Background(),
 		`SELECT id, user_id, balance, created_at, updated_at
-		 FROM accounts 
+		 FROM accounts
 		 WHERE id = $1;`,
 		id,
 	)
@@ -39,8 +39,8 @@ func (ar *AccountRepositoryImpl) Create(
 ) (models.Account, error) {
 	row := ar.db.QueryRow(
 		context.Background(),
-		`INSERT INTO accounts (user_id) 
-		 VALUES ($1) 
+		`INSERT INTO accounts (user_id)
+		 VALUES ($1)
     	 RETURNING id, user_id, balance, created_at, updated_at;`,
 		account.UserID,
 	)
@@ -53,9 +53,9 @@ func (ar *AccountRepositoryImpl) Update(
 ) (models.Account, error) {
 	row := ar.db.QueryRow(
 		context.Background(),
-		`UPDATE accounts 
-		SET balance = $2 
-		WHERE id = $1 
+		`UPDATE accounts
+		SET balance = $2
+		WHERE id = $1
 		RETURNING id, user_id, balance, created_at, updated_at;`,
 		account.ID, account.Balance,
 	)

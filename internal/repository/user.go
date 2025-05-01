@@ -39,7 +39,7 @@ func (ur *UserRepositoryImpl) Get(id int) (models.User, error) {
 func (ur *UserRepositoryImpl) Create(user models.User) (models.User, error) {
 	row := ur.db.QueryRow(
 		context.Background(),
-		`INSERT INTO users (email, username, password_hash) 
+		`INSERT INTO users (email, username, password_hash)
 		VALUES ($1, $2, crypt($3, gen_salt('bf')))
 		RETURNING id, email, username, password_hash, created_at, updated_at;`,
 		user.Email, user.Username, user.Password,

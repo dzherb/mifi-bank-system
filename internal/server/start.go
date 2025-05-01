@@ -34,6 +34,7 @@ func Start(cfg *config.Config) error {
 	}
 
 	log.Infof("starting the server on %s:%s", cfg.ServerHost, cfg.ServerPort)
+
 	return srv.ListenAndServe()
 }
 

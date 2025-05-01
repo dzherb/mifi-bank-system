@@ -87,7 +87,8 @@ func TestTokenValidation(t *testing.T) {
 			"iat": c.token.iat,
 			"sub": c.token.sub,
 			"exp": c.token.exp,
-		}).SignedString(security.SecretKey)
+		}).
+			SignedString(security.SecretKey)
 
 		if err != nil {
 			t.Error(err)
@@ -98,6 +99,7 @@ func TestTokenValidation(t *testing.T) {
 			if c.isValid {
 				t.Error("unexpected error:", err)
 			}
+
 			continue
 		}
 

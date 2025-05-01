@@ -30,11 +30,14 @@ func TestAuthMiddlewareSuccess(t *testing.T) {
 	userID := 25
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
+
 	token, err := security.IssueAccessToken(userID)
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	req.Header.Set("Authorization", "Bearer "+token)
+
 	rr := httptest.NewRecorder()
 
 	middleware.AuthRequired(handler).ServeHTTP(rr, req)
@@ -53,6 +56,7 @@ func TestAuthMiddlewareFail(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Set("Authorization", "Bearer fake_token")
+
 	rr := httptest.NewRecorder()
 
 	middleware.AuthRequired(handler).ServeHTTP(rr, req)

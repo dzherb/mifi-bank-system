@@ -21,7 +21,10 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
 				*r = *r.WithContext(ctx)
 
 				w.WriteHeader(http.StatusInternalServerError)
-				handlers.WriteErrorResponse(w, fmt.Errorf("internal server error"))
+				handlers.WriteErrorResponse(
+					w,
+					fmt.Errorf("internal server error"),
+				)
 			}
 		}()
 		next.ServeHTTP(w, r)

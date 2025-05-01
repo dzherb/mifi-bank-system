@@ -20,10 +20,12 @@ func AuthRequired(next http.Handler) http.Handler {
 		if authHeader == "" || !strings.HasPrefix(authHeader, TokenPrefix) {
 			w.WriteHeader(http.StatusUnauthorized)
 			handlers.WriteErrorResponse(w, fmt.Errorf("token must be provided"))
+
 			return
 		}
 
 		token := strings.TrimPrefix(authHeader, TokenPrefix)
+
 		userID, err := security.ValidateToken(token)
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)

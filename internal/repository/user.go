@@ -30,6 +30,7 @@ func (ur *UserRepositoryImpl) Get(id int) (models.User, error) {
 		WHERE id = $1;`,
 		id,
 	)
+
 	return ur.fromRow(row)
 }
 
@@ -41,10 +42,13 @@ func (ur *UserRepositoryImpl) Create(user models.User) (models.User, error) {
 		RETURNING id, email, username, password_hash, created_at, updated_at;`,
 		user.Email, user.Username, user.Password,
 	)
+
 	return ur.fromRow(row)
 }
 
-func (ur *UserRepositoryImpl) Authenticate(email, password string) (models.User, error) {
+func (ur *UserRepositoryImpl) Authenticate(
+	email, password string,
+) (models.User, error) {
 	row := ur.db.QueryRow(
 		context.Background(),
 		`SELECT id, email, username, password_hash, created_at, updated_at
@@ -52,6 +56,7 @@ func (ur *UserRepositoryImpl) Authenticate(email, password string) (models.User,
 		WHERE email = $1 AND crypt($2, password_hash) = password_hash;`,
 		email, password,
 	)
+
 	return ur.fromRow(row)
 }
 
@@ -65,8 +70,10 @@ func (ur *UserRepositoryImpl) fromRow(row pgx.Row) (models.User, error) {
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
+
 	if err != nil {
 		return models.User{}, err
 	}
+
 	return user, nil
 }

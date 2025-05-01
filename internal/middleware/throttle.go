@@ -25,6 +25,7 @@ func RateLimiter() func(http.Handler) http.Handler {
 		MaxRate:  throttled.PerMin(maxRatePerMinute),
 		MaxBurst: maxBurst,
 	}
+
 	rateLimiter, err := throttled.NewGCRARateLimiterCtx(store, quota)
 	if err != nil {
 		log.Fatal(err)

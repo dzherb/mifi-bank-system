@@ -17,8 +17,9 @@ import (
 
 // WithTempDB sets up a temporary PostgreSQL database for testing.
 //
-// It connects to the main database using the given config, creates a temp database,
-// switches the connection pool to use it, runs the tests, and then drops the temp database.
+// It connects to the main database using the given config,
+// creates a temp database, switches the connection pool
+// to use it, runs the tests, and then drops the temp database.
 //
 // Returns the exit code from testRunner or 1 on setup/cleanup failure.
 func WithTempDB(testRunner func() int) int {
@@ -55,35 +56,46 @@ func WithMigratedDB(testRunner func() int) int {
 		log.Error(err)
 		return 1
 	}
+
 	err = m.Up()
 	if err != nil {
 		log.Error(err)
 		return 1
 	}
+
 	defer func(m *migrate.Migrate) {
 		err = m.Down()
 		if err != nil {
 			log.Error(err)
 		}
+
 		err, err2 := m.Close()
 		if err != nil {
 			log.Error(err)
 		}
+
 		if err2 != nil {
 			log.Error(err2)
 		}
 	}(m)
+
 	return testRunner()
 }
 
-// WithTransaction runs the test function within a rolled-back transaction.
-// Fails the test immediately if beginning or rolling back the transaction fails.
-func WithTransaction(log interface{ Fatal(args ...any) }, test func(tx pgx.Tx)) {
+// WithTransaction runs the test function
+// within a rolled-back transaction.
+// Fails the test immediately if beginning
+// or rolling back the transaction fails.
+func WithTransaction(
+	log interface{ Fatal(args ...any) },
+	test func(tx pgx.Tx),
+) {
 	tx, err := Pool().Begin(context.Background())
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+
 	defer func(tx pgx.Tx, ctx context.Context) {
 		err = tx.Rollback(ctx)
 		if err != nil {
@@ -106,7 +118,11 @@ func migrator() (*migrate.Migrate, error) {
 	if !ok {
 		return nil, errors.New("unable to determine current file path")
 	}
-	migrationsPath := "file://" + filepath.Join(filepath.Dir(currentFile), "migrations")
+
+	migrationsPath := "file://" + filepath.Join(
+		filepath.Dir(currentFile),
+		"migrations",
+	)
 
 	return migrate.NewWithDatabaseInstance(
 		migrationsPath,
@@ -121,6 +137,7 @@ type testDBManager struct {
 
 func (tm *testDBManager) initTestDB() (string, error) {
 	name := uuid.NewString() + ".go_test"
+
 	err := createDB(name, "template1")
 	if err != nil {
 		return "", err
@@ -152,5 +169,6 @@ func (tm *testDBManager) dropTestDB(name string) error {
 	}
 
 	tm.originalPool = nil
+
 	return nil
 }

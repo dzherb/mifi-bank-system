@@ -23,23 +23,28 @@ func getMigrationRevisions() ([]uint, error) {
 		if file.IsDir() {
 			continue
 		}
+
 		match := re.FindStringSubmatch(file.Name())
+
 		if len(match) > 1 {
 			revisionSet[match[1]] = struct{}{}
 		}
 	}
 
 	revisions := make([]uint, 0, len(revisionSet)/2)
+
 	for rev := range revisionSet {
 		revNum, _ := strconv.ParseUint(rev, 10, 64)
 		revisions = append(revisions, uint(revNum))
 	}
 
 	slices.Sort(revisions)
+
 	return revisions, nil
 }
 
-// TestStairway verifies the integrity of each migration revision by performing the following steps:
+// TestStairway verifies the integrity of each
+// migration revision by performing the following steps:
 // 1. Applies the migration up to the given revision.
 // 2. Rolls back a single step (Steps(-1)).
 // 3. Reapplies the same revision.
@@ -60,6 +65,7 @@ func TestStairway(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+
 		if err2 != nil {
 			t.Fatal(err2)
 		}

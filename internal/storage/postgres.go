@@ -43,6 +43,7 @@ func Pool() *pgxpool.Pool {
 	if pool == nil {
 		panic("db is not initialized")
 	}
+
 	return pool
 }
 

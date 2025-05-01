@@ -37,6 +37,7 @@ linters:
     - unconvert
     - unused
     - whitespace
+    - wsl
   settings:
     misspell:
       locale: US
@@ -46,7 +47,7 @@ linters:
     gocognit:
       min-complexity: 15
     lll:
-      line-length: 100
+      line-length: 80
   exclusions:
     generated: lax
     rules:
@@ -65,9 +66,13 @@ issues:
 formatters:
   enable:
     - gofmt
+    - golines
   exclusions:
     generated: lax
     paths:
       - third_party$
       - builtin$
       - examples$
+  settings:
+    golines:
+      max-len: 80

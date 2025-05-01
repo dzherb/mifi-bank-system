@@ -11,7 +11,10 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 		start := time.Now()
 
 		// Wrap ResponseWriter to capture the status code
-		lrw := &loggingResponseWriter{ResponseWriter: w, statusCode: http.StatusOK}
+		lrw := &loggingResponseWriter{
+			ResponseWriter: w,
+			statusCode:     http.StatusOK,
+		}
 		next.ServeHTTP(lrw, r)
 
 		duration := time.Since(start)
@@ -26,6 +29,7 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 		if rec := r.Context().Value(panicKey); rec != nil {
 			entry = entry.WithField("panic", rec)
 			entry.Error("Recovered from panic")
+
 			return
 		}
 

@@ -20,6 +20,7 @@ func TestServerStartAndShutdown(t *testing.T) {
 			if errors.Is(err, http.ErrServerClosed) {
 				return
 			}
+
 			t.Error(err)
 		}
 	}()

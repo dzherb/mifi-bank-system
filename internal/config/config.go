@@ -37,6 +37,7 @@ func loadDotenv() {
 		if err != nil {
 			continue
 		}
+
 		return
 	}
 
@@ -55,18 +56,22 @@ func envOrPanic(key string) string {
 	if value, ok := os.LookupEnv(key); ok {
 		return value
 	}
+
 	panic(fmt.Sprintf("environment variable %s not set", key))
 }
 
 func accessTokenTTL() time.Duration {
 	const defaultTTL = time.Minute * 60
+
 	ttl, ok := os.LookupEnv("ACCESS_TOKEN_TTL_IN_MINUTES")
 	if !ok {
 		return defaultTTL
 	}
+
 	tokenTTL, err := strconv.Atoi(ttl)
 	if err != nil {
 		return defaultTTL
 	}
+
 	return time.Duration(tokenTTL) * time.Minute
 }

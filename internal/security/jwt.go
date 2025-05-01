@@ -22,13 +22,16 @@ func IssueAccessToken(userID int) (string, error) {
 		"sub": strconv.Itoa(userID),
 		"exp": timeToFloat64(now.Add(accessTokenTTL)),
 	})
+
 	return token.SignedString(secretKey)
 }
 
 func ValidateToken(tokenString string) (int, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return secretKey, nil
-	},
+	token, err := jwt.Parse(
+		tokenString,
+		func(token *jwt.Token) (interface{}, error) {
+			return secretKey, nil
+		},
 		jwt.WithIssuedAt(),
 		jwt.WithExpirationRequired(),
 	)
@@ -46,5 +49,6 @@ func ValidateToken(tokenString string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+
 	return userID, nil
 }

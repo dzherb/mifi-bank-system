@@ -28,10 +28,13 @@ func (ar *AccountRepositoryImpl) Get(id int) (models.Account, error) {
 		 WHERE id = $1;`,
 		id,
 	)
+
 	return ar.fromRow(row)
 }
 
-func (ar *AccountRepositoryImpl) Create(account models.Account) (models.Account, error) {
+func (ar *AccountRepositoryImpl) Create(
+	account models.Account,
+) (models.Account, error) {
 	row := ar.db.QueryRow(
 		context.Background(),
 		`INSERT INTO accounts (user_id) 
@@ -39,10 +42,13 @@ func (ar *AccountRepositoryImpl) Create(account models.Account) (models.Account,
     	 RETURNING id, user_id, balance, created_at, updated_at;`,
 		account.UserID,
 	)
+
 	return ar.fromRow(row)
 }
 
-func (ar *AccountRepositoryImpl) Update(account models.Account) (models.Account, error) {
+func (ar *AccountRepositoryImpl) Update(
+	account models.Account,
+) (models.Account, error) {
 	row := ar.db.QueryRow(
 		context.Background(),
 		`UPDATE accounts 
@@ -51,6 +57,7 @@ func (ar *AccountRepositoryImpl) Update(account models.Account) (models.Account,
 			RETURNING id, user_id, balance, created_at, updated_at;`,
 		account.ID, account.Balance,
 	)
+
 	return ar.fromRow(row)
 }
 
@@ -63,8 +70,10 @@ func (ar *AccountRepositoryImpl) fromRow(row pgx.Row) (models.Account, error) {
 		&account.CreatedAt,
 		&account.UpdatedAt,
 	)
+
 	if err != nil {
 		return models.Account{}, err
 	}
+
 	return account, nil
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/dzherb/mifi-bank-system/internal/config"
 	"github.com/dzherb/mifi-bank-system/internal/server"
@@ -25,6 +26,9 @@ func TestServerStartAndShutdown(t *testing.T) {
 			t.Error(err)
 		}
 	}()
+
+	// make sure the server has started
+	time.Sleep(1 * time.Second)
 
 	defer func(ctx context.Context) {
 		err := server.Shutdown(ctx)

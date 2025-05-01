@@ -11,7 +11,6 @@ import (
 	"github.com/dzherb/mifi-bank-system/internal/models"
 	"github.com/dzherb/mifi-bank-system/internal/repository"
 	"github.com/dzherb/mifi-bank-system/internal/storage"
-	"github.com/jackc/pgx/v5"
 	"github.com/shopspring/decimal"
 )
 
@@ -38,9 +37,9 @@ func testUser() models.User {
 }
 
 func TestUserRepositoryImpl_Create(t *testing.T) {
-	storage.WithTransaction(t, func(tx pgx.Tx) {
+	storage.WithTransaction(t, func() {
 		now := time.Now().Add(-time.Second * 10)
-		ur := repo.NewUserRepository(tx)
+		ur := repo.NewUserRepository()
 
 		userToCreate := testUser()
 
@@ -84,15 +83,15 @@ func TestUserRepositoryImpl_Create(t *testing.T) {
 }
 
 func TestUserRepositoryImpl_Authenticate(t *testing.T) {
-	storage.WithTransaction(t, func(tx pgx.Tx) {
-		ur := repo.NewUserRepository(tx)
+	storage.WithTransaction(t, func() {
+		ur := repo.NewUserRepository()
 
 		created, err := ur.Create(testUser())
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		got, err := ur.Authenticate(created.Email, "test_pass")
+		got, err := ur.GetByCredentials(created.Email, "test_pass")
 		if err != nil {
 			t.Error(err)
 			return
@@ -105,15 +104,15 @@ func TestUserRepositoryImpl_Authenticate(t *testing.T) {
 }
 
 func TestUserRepositoryImpl_Authenticate2(t *testing.T) {
-	storage.WithTransaction(t, func(tx pgx.Tx) {
-		ur := repo.NewUserRepository(tx)
+	storage.WithTransaction(t, func() {
+		ur := repo.NewUserRepository()
 
 		created, err := ur.Create(testUser())
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		_, err = ur.Authenticate(created.Email, "wrong_pass")
+		_, err = ur.GetByCredentials(created.Email, "wrong_pass")
 		if err == nil {
 			t.Error("expected error")
 		}
@@ -121,8 +120,8 @@ func TestUserRepositoryImpl_Authenticate2(t *testing.T) {
 }
 
 func TestUserRepositoryImpl_Get(t *testing.T) {
-	storage.WithTransaction(t, func(tx pgx.Tx) {
-		ur := repo.NewUserRepository(tx)
+	storage.WithTransaction(t, func() {
+		ur := repo.NewUserRepository()
 
 		created, err := ur.Create(testUser())
 		if err != nil {
@@ -142,10 +141,10 @@ func TestUserRepositoryImpl_Get(t *testing.T) {
 }
 
 func TestAccountRepositoryImpl_Create(t *testing.T) {
-	storage.WithTransaction(t, func(tx pgx.Tx) {
+	storage.WithTransaction(t, func() {
 		now := time.Now().Add(-time.Second * 10)
-		ar := repo.NewAccountRepository(tx)
-		ur := repo.NewUserRepository(tx)
+		ar := repo.NewAccountRepository()
+		ur := repo.NewUserRepository()
 
 		user, err := ur.Create(testUser())
 		if err != nil {
@@ -188,9 +187,9 @@ func TestAccountRepositoryImpl_Create(t *testing.T) {
 }
 
 func TestAccountRepositoryImpl_Get(t *testing.T) {
-	storage.WithTransaction(t, func(tx pgx.Tx) {
-		ar := repo.NewAccountRepository(tx)
-		ur := repo.NewUserRepository(tx)
+	storage.WithTransaction(t, func() {
+		ar := repo.NewAccountRepository()
+		ur := repo.NewUserRepository()
 
 		user, err := ur.Create(testUser())
 		if err != nil {
@@ -216,9 +215,9 @@ func TestAccountRepositoryImpl_Get(t *testing.T) {
 }
 
 func TestAccountRepositoryImpl_Update(t *testing.T) {
-	storage.WithTransaction(t, func(tx pgx.Tx) {
-		ar := repo.NewAccountRepository(tx)
-		ur := repo.NewUserRepository(tx)
+	storage.WithTransaction(t, func() {
+		ar := repo.NewAccountRepository()
+		ur := repo.NewUserRepository()
 
 		user, err := ur.Create(testUser())
 		if err != nil {

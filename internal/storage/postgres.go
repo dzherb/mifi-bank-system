@@ -54,3 +54,7 @@ func ClosePool() {
 		pool = nil
 	}
 }
+
+var Conn = func() Connection { // can be mocked in tests
+	return Pool()
+}

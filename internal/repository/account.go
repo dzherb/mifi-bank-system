@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/dzherb/mifi-bank-system/internal/models"
+	"github.com/dzherb/mifi-bank-system/internal/storage"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -14,11 +15,11 @@ type AccountRepository interface {
 }
 
 type AccountRepositoryImpl struct {
-	db pgx.Tx
+	db storage.Connection
 }
 
-func NewAccountRepository(tx pgx.Tx) AccountRepository {
-	return &AccountRepositoryImpl{db: tx}
+func NewAccountRepository() AccountRepository {
+	return &AccountRepositoryImpl{db: storage.Conn()}
 }
 
 func (ar *AccountRepositoryImpl) Get(id int) (models.Account, error) {
@@ -53,9 +54,9 @@ func (ar *AccountRepositoryImpl) Update(
 	row := ar.db.QueryRow(
 		context.Background(),
 		`UPDATE accounts 
-			SET balance = $2 
-			WHERE id = $1 
-			RETURNING id, user_id, balance, created_at, updated_at;`,
+		SET balance = $2 
+		WHERE id = $1 
+		RETURNING id, user_id, balance, created_at, updated_at;`,
 		account.ID, account.Balance,
 	)
 

@@ -4,22 +4,23 @@ import (
 	"context"
 
 	"github.com/dzherb/mifi-bank-system/internal/models"
+	"github.com/dzherb/mifi-bank-system/internal/storage"
 	"github.com/jackc/pgx/v5"
 )
 
 type UserRepository interface {
 	Get(id int) (models.User, error)
+	GetByCredentials(email, password string) (models.User, error)
 	Create(user models.User) (models.User, error)
-	Authenticate(email, password string) (models.User, error)
 }
 
 type UserRepositoryImpl struct {
-	db pgx.Tx
+	db storage.Connection
 }
 
-func NewUserRepository(tx pgx.Tx) UserRepository {
+func NewUserRepository() UserRepository {
 	return &UserRepositoryImpl{
-		db: tx,
+		db: storage.Conn(),
 	}
 }
 
@@ -47,7 +48,7 @@ func (ur *UserRepositoryImpl) Create(user models.User) (models.User, error) {
 	return ur.fromRow(row)
 }
 
-func (ur *UserRepositoryImpl) Authenticate(
+func (ur *UserRepositoryImpl) GetByCredentials(
 	email, password string,
 ) (models.User, error) {
 	row := ur.db.QueryRow(

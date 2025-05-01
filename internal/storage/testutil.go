@@ -5,6 +5,7 @@ import (
 	"errors"
 	"path/filepath"
 	"runtime"
+	"testing"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -88,13 +89,28 @@ func WithMigratedDB(testRunner func() int) int {
 // Fails the test immediately if beginning
 // or rolling back the transaction fails.
 func WithTransaction(
-	log interface{ Fatal(args ...any) },
-	test func(tx pgx.Tx),
+	t *testing.T,
+	test func(),
 ) {
-	tx, err := Pool().Begin(context.Background())
+	tx, err := Pool().Begin(t.Context())
 	if err != nil {
-		log.Fatal(err)
-		return
+		t.Fatal(err)
+	}
+
+	// Create a savepoint to prevent any function
+	// from performing a real commit.
+	// This ensures changes are rolled back after the test.
+	nestedTx, err := tx.Begin(t.Context())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	prevConn := Conn
+
+	// Mock the Conn function
+	// to return the nested transaction.
+	Conn = func() Connection {
+		return nestedTx
 	}
 
 	defer func(tx pgx.Tx, ctx context.Context) {
@@ -102,8 +118,11 @@ func WithTransaction(
 		if err != nil {
 			log.Fatal(err)
 		}
-	}(tx, context.Background())
-	test(tx)
+
+		Conn = prevConn
+	}(tx, t.Context())
+
+	test()
 }
 
 func migrator() (*migrate.Migrate, error) {

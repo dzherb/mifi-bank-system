@@ -36,7 +36,7 @@ export PGPASSWORD=$pass
 npx pg-mermaid \
 --host $host \
 --port $port \
---dbname dbname \
+--dbname $dbname \
 --username $user \
 --excluded-tables schema_migrations \
 --output-path "$PROJECT_ROOT/database.md"

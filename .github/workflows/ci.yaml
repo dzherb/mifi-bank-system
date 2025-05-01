@@ -46,7 +46,7 @@ jobs:
         env:
           SECRET_KEY: not_secret
           DATABASE_URL: postgres://postgres:password@localhost:5432/test_db?sslmode=disable
-        run: make test
+        run: make cover
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
         with:
@@ -54,7 +54,7 @@ jobs:
           path: cover.out
 
   coverage:
-    name: Check test coverage
+    name: Check coverage
     needs: test
     runs-on: ubuntu-latest
     steps:

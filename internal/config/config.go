@@ -31,7 +31,12 @@ func Load() *Config {
 }
 
 func loadDotenv() {
-	tryFiles := []string{".env", "../../.env"}
+	tryFiles := []string{
+		".env",
+		"../.env",
+		"../../.env",
+		"../../../.env",
+	}
 
 	for _, file := range tryFiles {
 		err := godotenv.Load(file)

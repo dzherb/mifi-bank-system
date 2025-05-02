@@ -48,6 +48,8 @@ linters:
       min-complexity: 15
     lll:
       line-length: 80
+    tagalign:
+      sort: false
   exclusions:
     generated: lax
     rules:

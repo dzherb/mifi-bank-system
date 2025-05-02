@@ -8,4 +8,4 @@ threshold:
   package: 60
 
   # Minimum overall project coverage percentage required.
-  total: 70
+  total: 75

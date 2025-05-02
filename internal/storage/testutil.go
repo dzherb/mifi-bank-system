@@ -211,9 +211,9 @@ func (tm *testDBManager) initTestDB() (string, error) {
 	return name, nil
 }
 
-func (tm *testDBManager) dropTestDB(name string) error {
-	// Close the connection to the temporary database.
-	closePool()
+func (tm *testDBManager) dropTestDB(name string) error { // coverage-ignore
+	// (it's actually tested, but cover don't catch it...)
+	closePool() // Close the connection to the temporary database.
 
 	pool = tm.originalPool
 

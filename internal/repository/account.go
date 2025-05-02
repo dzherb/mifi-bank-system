@@ -23,7 +23,7 @@ func NewAccountRepository() AccountRepository {
 	return &AccountRepositoryImpl{db: storage.Conn()}
 }
 
-func NewAccountRepositoryWithTx(tx pgx.Tx) AccountRepository {
+func NewAccountRepositoryFromTx(tx pgx.Tx) AccountRepository {
 	return &AccountRepositoryImpl{db: tx}
 }
 
@@ -53,10 +53,11 @@ func (ar *AccountRepositoryImpl) Create(
 		context.Background(),
 		ar.db,
 		&account,
-		`INSERT INTO accounts (user_id)
-		 VALUES ($1)
+		`INSERT INTO accounts (user_id, balance)
+		 VALUES ($1, $2)
     	 RETURNING id, user_id, balance, created_at, updated_at;`,
 		account.UserID,
+		account.Balance,
 	)
 	if err != nil {
 		return models.Account{}, err

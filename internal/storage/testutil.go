@@ -17,14 +17,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// WithTempDB sets up a temporary PostgreSQL database for testing.
+// RunTestsWithTempDB sets up a temporary PostgreSQL database for testing.
 //
 // It connects to the main database using the given config,
 // creates a temp database, switches the connection pool
 // to use it, runs the tests, and then drops the temp database.
 //
 // Returns the exit code from testRunner or 1 on setup/cleanup failure.
-func WithTempDB(testRunner func() int) int {
+func RunTestsWithTempDB(testRunner func() int) int {
 	tm := testDBManager{}
 
 	name, err := tm.initTestDB()
@@ -39,20 +39,23 @@ func WithTempDB(testRunner func() int) int {
 			log.Error(err)
 		}
 		// Close the connection to the original database.
-		ClosePool()
+		closePool()
 	}()
 
 	// Run the tests.
 	return testRunner()
 }
 
-// WithMigratedDB applies all up migrations, runs the provided test runner,
+// RunTestsWithMigratedDB applies all up migrations,
+// runs the provided test runner,
 // and then rolls back all migrations.
 //
-// If any step fails, the error is logged and the function returns exit code 1.
+// If any step fails, the error is logged
+// and the function returns exit code 1.
 //
-// Returns the exit code from the test runner (typically passed to os.Exit).
-func WithMigratedDB(testRunner func() int) int {
+// Returns the exit code from the test runner
+// (typically passed to os.Exit).
+func RunTestsWithMigratedDB(testRunner func() int) int {
 	m, err := migrator()
 	if err != nil {
 		log.Error(err)
@@ -84,15 +87,45 @@ func WithMigratedDB(testRunner func() int) int {
 	return testRunner()
 }
 
-// TestWithTransaction runs the test function
-// within a rolled-back transaction.
-// Fails the test immediately if beginning
-// or rolling back the transaction fails.
-func TestWithTransaction(
-	t *testing.T,
-	test func(),
-) {
-	tx, err := Pool().Begin(t.Context())
+// TestWithMigratedDB applies all up migrations,
+// then registers a cleanup function
+// to roll them back after the test finishes.
+//
+// This helper is intended for individual tests.
+// It fails the test immediately with t.Fatal
+// if migration setup fails.
+func TestWithMigratedDB(t *testing.T) {
+	m, err := migrator()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = m.Up()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Cleanup(func() {
+		err = m.Down()
+		if err != nil { // coverage-ignore
+			t.Fatal(err)
+		}
+
+		err, err2 := m.Close()
+		if err != nil { // coverage-ignore
+			t.Fatal(err)
+		}
+
+		if err2 != nil { // coverage-ignore
+			t.Fatal(err2)
+		}
+	})
+}
+
+// TestWithTransaction sets up a rolled-back transaction for a test.
+// Fails the test if setup fails.
+func TestWithTransaction(t *testing.T) {
+	tx, err := activePool().Begin(t.Context())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -113,20 +146,21 @@ func TestWithTransaction(
 		return nestedTx
 	}
 
-	defer func(tx pgx.Tx, ctx context.Context) {
-		err = tx.Rollback(ctx)
-		if err != nil {
-			log.Fatal(err)
+	t.Cleanup(func() {
+		// Use Background context,
+		// because t.Context() is already closed on Cleanup
+		ctx := context.Background() //nolint:usetesting
+		if err = tx.Rollback(ctx); err != nil &&
+			!errors.Is(err, pgx.ErrTxClosed) {
+			log.Error(err)
 		}
 
 		Conn = prevConn
-	}(tx, t.Context())
-
-	test()
+	})
 }
 
 func migrator() (*migrate.Migrate, error) {
-	db := stdlib.OpenDBFromPool(Pool())
+	db := stdlib.OpenDBFromPool(activePool())
 
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
@@ -136,7 +170,7 @@ func migrator() (*migrate.Migrate, error) {
 	// Compute path relative to this file (resolves to `.../storage/migrations`)
 	_, currentFile, _, ok := runtime.Caller(0)
 	if !ok {
-		return nil, errors.New("unable to determine current file path")
+		return nil, errors.New("unable to determine the current file path")
 	}
 
 	migrationsPath := "file://" + filepath.Join(
@@ -146,7 +180,7 @@ func migrator() (*migrate.Migrate, error) {
 
 	return migrate.NewWithDatabaseInstance(
 		migrationsPath,
-		Pool().Config().ConnConfig.Database,
+		activePool().Config().ConnConfig.Database,
 		driver,
 	)
 }
@@ -179,7 +213,7 @@ func (tm *testDBManager) initTestDB() (string, error) {
 
 func (tm *testDBManager) dropTestDB(name string) error {
 	// Close the connection to the temporary database.
-	ClosePool()
+	closePool()
 
 	pool = tm.originalPool
 

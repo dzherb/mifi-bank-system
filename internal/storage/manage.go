@@ -11,7 +11,7 @@ func createDB(name, template string) error {
 		name,
 		template,
 	)
-	_, err := Pool().Exec(context.Background(), query)
+	_, err := activePool().Exec(context.Background(), query)
 
 	return err
 }
@@ -19,7 +19,7 @@ func createDB(name, template string) error {
 func dropDB(name string) error { // coverage-ignore
 	// (it's actually tested, but cover don't catch it...)
 	query := fmt.Sprintf(`DROP DATABASE "%s";`, name)
-	_, err := Pool().Exec(context.Background(), query)
+	_, err := activePool().Exec(context.Background(), query)
 
 	return err
 }

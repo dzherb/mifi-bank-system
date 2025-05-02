@@ -21,8 +21,8 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	code := storage.WithTempDB(func() int {
-		return storage.WithMigratedDB(m.Run)
+	code := storage.RunTestsWithTempDB(func() int {
+		return storage.RunTestsWithMigratedDB(m.Run)
 	})
 	os.Exit(code)
 }

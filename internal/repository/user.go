@@ -6,6 +6,7 @@ import (
 	"github.com/dzherb/mifi-bank-system/internal/models"
 	"github.com/dzherb/mifi-bank-system/internal/storage"
 	"github.com/georgysavva/scany/v2/pgxscan"
+	"github.com/jackc/pgx/v5"
 )
 
 type UserRepository interface {
@@ -21,6 +22,12 @@ type UserRepositoryImpl struct {
 func NewUserRepository() UserRepository {
 	return &UserRepositoryImpl{
 		db: storage.Conn(),
+	}
+}
+
+func NewUserRepositoryFromTx(tx pgx.Tx) UserRepository {
+	return &UserRepositoryImpl{
+		db: tx,
 	}
 }
 

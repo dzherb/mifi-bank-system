@@ -23,8 +23,8 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	code := storage.WithTempDB(func() int {
-		return storage.WithMigratedDB(m.Run)
+	code := storage.RunTestsWithTempDB(func() int {
+		return storage.RunTestsWithMigratedDB(m.Run)
 	})
 	os.Exit(code)
 }
@@ -38,49 +38,49 @@ func testUser() models.User {
 }
 
 func TestUserRepositoryImpl_Create(t *testing.T) {
-	storage.TestWithTransaction(t, func() {
-		now := time.Now().Add(-time.Second * 10)
-		ur := repo.NewUserRepository()
+	storage.TestWithTransaction(t)
 
-		userToCreate := testUser()
+	now := time.Now().Add(-time.Second * 10)
+	ur := repo.NewUserRepository()
 
-		user, err := ur.Create(userToCreate)
-		if err != nil {
-			t.Fatal(err)
-		}
+	userToCreate := testUser()
 
-		if user.ID == 0 {
-			t.Error("user ID is zero")
-		}
+	user, err := ur.Create(userToCreate)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		if user.Email != userToCreate.Email {
-			t.Errorf(
-				"expected email %q, got %q",
-				userToCreate.Email,
-				user.Email,
-			)
-		}
+	if user.ID == 0 {
+		t.Error("user ID is zero")
+	}
 
-		if user.Username != userToCreate.Username {
-			t.Errorf(
-				"expected username %q, got %q",
-				userToCreate.Username,
-				user.Username,
-			)
-		}
+	if user.Email != userToCreate.Email {
+		t.Errorf(
+			"expected email %q, got %q",
+			userToCreate.Email,
+			user.Email,
+		)
+	}
 
-		if user.Password == userToCreate.Password {
-			t.Errorf("expected password to be hashed")
-		}
+	if user.Username != userToCreate.Username {
+		t.Errorf(
+			"expected username %q, got %q",
+			userToCreate.Username,
+			user.Username,
+		)
+	}
 
-		if user.CreatedAt.Before(now) {
-			t.Errorf("created_at %s is earlier than expected", user.CreatedAt)
-		}
+	if user.Password == userToCreate.Password {
+		t.Errorf("expected password to be hashed")
+	}
 
-		if user.UpdatedAt.Before(now) {
-			t.Errorf("updated_at %s is earlier than expected", user.UpdatedAt)
-		}
-	})
+	if user.CreatedAt.Before(now) {
+		t.Errorf("created_at %s is earlier than expected", user.CreatedAt)
+	}
+
+	if user.UpdatedAt.Before(now) {
+		t.Errorf("updated_at %s is earlier than expected", user.UpdatedAt)
+	}
 }
 
 func TestUserConstraints(t *testing.T) {
@@ -98,8 +98,11 @@ func TestUserConstraints(t *testing.T) {
 			Password: "test_pass",
 		},
 	}
+
 	for _, u := range users {
-		storage.TestWithTransaction(t, func() {
+		t.Run(u.Username, func(t *testing.T) {
+			storage.TestWithTransaction(t)
+
 			ur := repo.NewUserRepository()
 
 			_, err := ur.Create(firstUser)
@@ -122,166 +125,166 @@ func TestUserConstraints(t *testing.T) {
 }
 
 func TestUserRepositoryImpl_Authenticate(t *testing.T) {
-	storage.TestWithTransaction(t, func() {
-		ur := repo.NewUserRepository()
+	storage.TestWithTransaction(t)
 
-		created, err := ur.Create(testUser())
-		if err != nil {
-			t.Fatal(err)
-		}
+	ur := repo.NewUserRepository()
 
-		got, err := ur.GetByCredentials(created.Email, "test_pass")
-		if err != nil {
-			t.Error(err)
-			return
-		}
+	created, err := ur.Create(testUser())
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		if got != created {
-			t.Errorf("expected user to be %v, got %v", created, got)
-		}
-	})
+	got, err := ur.GetByCredentials(created.Email, "test_pass")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if got != created {
+		t.Errorf("expected user to be %v, got %v", created, got)
+	}
 }
 
 func TestUserRepositoryImpl_Authenticate2(t *testing.T) {
-	storage.TestWithTransaction(t, func() {
-		ur := repo.NewUserRepository()
+	storage.TestWithTransaction(t)
 
-		created, err := ur.Create(testUser())
-		if err != nil {
-			t.Fatal(err)
-		}
+	ur := repo.NewUserRepository()
 
-		_, err = ur.GetByCredentials(created.Email, "wrong_pass")
-		if err == nil {
-			t.Error("expected error")
-		}
-	})
+	created, err := ur.Create(testUser())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = ur.GetByCredentials(created.Email, "wrong_pass")
+	if err == nil {
+		t.Error("expected error")
+	}
 }
 
 func TestUserRepositoryImpl_Get(t *testing.T) {
-	storage.TestWithTransaction(t, func() {
-		ur := repo.NewUserRepository()
+	storage.TestWithTransaction(t)
 
-		created, err := ur.Create(testUser())
-		if err != nil {
-			t.Fatal(err)
-		}
+	ur := repo.NewUserRepository()
 
-		got, err := ur.Get(created.ID)
+	created, err := ur.Create(testUser())
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		if err != nil {
-			t.Fatal(err)
-		}
+	got, err := ur.Get(created.ID)
 
-		if got != created {
-			t.Errorf("expected user %+v, got %+v", created, got)
-		}
-	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if got != created {
+		t.Errorf("expected user %+v, got %+v", created, got)
+	}
 }
 
 func TestAccountRepositoryImpl_Create(t *testing.T) {
-	storage.TestWithTransaction(t, func() {
-		now := time.Now().Add(-time.Second * 10)
-		ar := repo.NewAccountRepository()
-		ur := repo.NewUserRepository()
+	storage.TestWithTransaction(t)
 
-		user, err := ur.Create(testUser())
-		if err != nil {
-			t.Fatal(err)
-		}
+	now := time.Now().Add(-time.Second * 10)
+	ar := repo.NewAccountRepository()
+	ur := repo.NewUserRepository()
 
-		account, err := ar.Create(models.Account{
-			UserID: user.ID,
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
+	user, err := ur.Create(testUser())
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		if account.ID == 0 {
-			t.Error("account ID is zero")
-		}
-
-		if account.UserID != user.ID {
-			t.Errorf("expected user ID %d, got %d", user.ID, account.UserID)
-		}
-
-		if !account.Balance.IsZero() {
-			t.Errorf("expected balance 0, got %q", account.Balance)
-		}
-
-		if account.CreatedAt.Before(now) {
-			t.Errorf(
-				"created_at %s is earlier than expected",
-				account.CreatedAt,
-			)
-		}
-
-		if account.UpdatedAt.Before(now) {
-			t.Errorf(
-				"updated_at %s is earlier than expected",
-				account.UpdatedAt,
-			)
-		}
+	account, err := ar.Create(models.Account{
+		UserID: user.ID,
 	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if account.ID == 0 {
+		t.Error("account ID is zero")
+	}
+
+	if account.UserID != user.ID {
+		t.Errorf("expected user ID %d, got %d", user.ID, account.UserID)
+	}
+
+	if !account.Balance.IsZero() {
+		t.Errorf("expected balance 0, got %q", account.Balance)
+	}
+
+	if account.CreatedAt.Before(now) {
+		t.Errorf(
+			"created_at %s is earlier than expected",
+			account.CreatedAt,
+		)
+	}
+
+	if account.UpdatedAt.Before(now) {
+		t.Errorf(
+			"updated_at %s is earlier than expected",
+			account.UpdatedAt,
+		)
+	}
 }
 
 func TestAccountRepositoryImpl_Get(t *testing.T) {
-	storage.TestWithTransaction(t, func() {
-		ar := repo.NewAccountRepository()
-		ur := repo.NewUserRepository()
+	storage.TestWithTransaction(t)
 
-		user, err := ur.Create(testUser())
-		if err != nil {
-			t.Fatal(err)
-		}
+	ar := repo.NewAccountRepository()
+	ur := repo.NewUserRepository()
 
-		created, err := ar.Create(models.Account{
-			UserID: user.ID,
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
+	user, err := ur.Create(testUser())
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		got, err := ar.Get(created.ID)
-		if err != nil {
-			return
-		}
-
-		if !reflect.DeepEqual(got, created) {
-			t.Errorf("expected account %+v, got %+v", created, got)
-		}
+	created, err := ar.Create(models.Account{
+		UserID: user.ID,
 	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := ar.Get(created.ID)
+	if err != nil {
+		return
+	}
+
+	if !reflect.DeepEqual(got, created) {
+		t.Errorf("expected account %+v, got %+v", created, got)
+	}
 }
 
 func TestAccountRepositoryImpl_Update(t *testing.T) {
-	storage.TestWithTransaction(t, func() {
-		ar := repo.NewAccountRepository()
-		ur := repo.NewUserRepository()
+	storage.TestWithTransaction(t)
 
-		user, err := ur.Create(testUser())
-		if err != nil {
-			t.Fatal(err)
-		}
+	ar := repo.NewAccountRepository()
+	ur := repo.NewUserRepository()
 
-		created, err := ar.Create(models.Account{
-			UserID: user.ID,
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
+	user, err := ur.Create(testUser())
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		updated := models.Account{
-			ID:      created.ID,
-			Balance: created.Balance.Add(decimal.NewFromInt(100)),
-		}
-
-		updated, err = ar.Update(updated)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if !updated.Balance.Equal(decimal.NewFromInt(100)) {
-			t.Errorf("expected balance to be 100, got %v", updated.Balance)
-		}
+	created, err := ar.Create(models.Account{
+		UserID: user.ID,
 	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	updated := models.Account{
+		ID:      created.ID,
+		Balance: created.Balance.Add(decimal.NewFromInt(100)),
+	}
+
+	updated, err = ar.Update(updated)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !updated.Balance.Equal(decimal.NewFromInt(100)) {
+		t.Errorf("expected balance to be 100, got %v", updated.Balance)
+	}
 }

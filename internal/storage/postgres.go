@@ -2,6 +2,8 @@ package storage
 
 import (
 	"context"
+	"strconv"
+	"time"
 
 	"github.com/dzherb/mifi-bank-system/internal/config"
 	"github.com/jackc/pgx-logrus"
@@ -12,9 +14,18 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Conn provides access to the database connection.
+// It returns a pgxpool.Pool wrapped in the Connection interface.
+//
+// This function is declared as a variable
+// so it can be overridden or mocked in tests.
+var Conn = func() Connection {
+	return activePool()
+}
+
 var pool *pgxpool.Pool
 
-func Pool() *pgxpool.Pool {
+func activePool() *pgxpool.Pool {
 	if pool == nil {
 		panic("db is not initialized")
 	}
@@ -22,16 +33,14 @@ func Pool() *pgxpool.Pool {
 	return pool
 }
 
-func ClosePool() {
+func closePool() {
 	if pool != nil {
 		pool.Close()
 		pool = nil
 	}
 }
 
-var Conn = func() Connection { // can be mocked in tests
-	return Pool()
-}
+const DefaultStatementTimeout = 10 * time.Second
 
 func Init(cfg *config.Config) (func(), error) {
 	var err error
@@ -42,7 +51,10 @@ func Init(cfg *config.Config) (func(), error) {
 	}
 
 	pgxCfg.ConnConfig.Tracer = logrusTracer(tracelog.LogLevelWarn)
-	pgxCfg.AfterConnect = registerTypes
+	pgxCfg.AfterConnect = compositeAfterConnect(
+		registerTypes,
+		setStatementTimeout(DefaultStatementTimeout),
+	)
 
 	pool, err = pgxpool.NewWithConfig(context.Background(), pgxCfg)
 	if err != nil {
@@ -54,12 +66,7 @@ func Init(cfg *config.Config) (func(), error) {
 		return nil, err
 	}
 
-	return ClosePool, nil
-}
-
-func registerTypes(_ context.Context, conn *pgx.Conn) error {
-	decimal.Register(conn.TypeMap())
-	return nil
+	return closePool, nil
 }
 
 func logrusTracer(level tracelog.LogLevel) *tracelog.TraceLog {
@@ -68,5 +75,36 @@ func logrusTracer(level tracelog.LogLevel) *tracelog.TraceLog {
 	return &tracelog.TraceLog{
 		Logger:   logger,
 		LogLevel: level,
+	}
+}
+
+type afterConnect func(ctx context.Context, conn *pgx.Conn) error
+
+func compositeAfterConnect(funcs ...afterConnect) afterConnect {
+	return func(ctx context.Context, conn *pgx.Conn) error {
+		for _, f := range funcs {
+			if err := f(ctx, conn); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+}
+
+func registerTypes(_ context.Context, conn *pgx.Conn) error {
+	decimal.Register(conn.TypeMap())
+	return nil
+}
+
+func setStatementTimeout(timeout time.Duration) afterConnect {
+	return func(ctx context.Context, conn *pgx.Conn) error {
+		t := strconv.FormatFloat(timeout.Seconds(), 'f', -1, 64)
+		_, err := conn.Exec(
+			ctx,
+			"SET statement_timeout = '"+t+"s'",
+		)
+
+		return err
 	}
 }

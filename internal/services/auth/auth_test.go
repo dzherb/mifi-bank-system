@@ -23,80 +23,80 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	code := storage.WithTempDB(func() int {
-		return storage.WithMigratedDB(m.Run)
+	code := storage.RunTestsWithTempDB(func() int {
+		return storage.RunTestsWithMigratedDB(m.Run)
 	})
 	os.Exit(code)
 }
 
 func TestLogin(t *testing.T) {
-	storage.TestWithTransaction(t, func() {
-		ur := repo.NewUserRepository()
-		user, err := ur.Create(models.User{
-			Username: "test",
-			Email:    "test@test.com",
-			Password: "test_pass",
-		})
+	storage.TestWithTransaction(t)
 
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		as := auth.NewService()
-
-		got, err := as.Login(user.Email, "test_pass")
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-			return
-		}
-
-		if got.User != user {
-			t.Errorf("got user %v, want %v", got.User, user)
-			return
-		}
-
-		userID, err := security.ValidateToken(got.Token)
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-			return
-		}
-
-		if got.User.ID != userID {
-			t.Errorf("got userID %v, want %v", userID, got.User.ID)
-		}
+	ur := repo.NewUserRepository()
+	user, err := ur.Create(models.User{
+		Username: "test",
+		Email:    "test@test.com",
+		Password: "test_pass",
 	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	as := auth.NewService()
+
+	got, err := as.Login(user.Email, "test_pass")
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+		return
+	}
+
+	if got.User != user {
+		t.Errorf("got user %v, want %v", got.User, user)
+		return
+	}
+
+	userID, err := security.ValidateToken(got.Token)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+		return
+	}
+
+	if got.User.ID != userID {
+		t.Errorf("got userID %v, want %v", userID, got.User.ID)
+	}
 }
 
 func TestRegister(t *testing.T) {
-	storage.TestWithTransaction(t, func() {
-		as := auth.NewService()
+	storage.TestWithTransaction(t)
 
-		res, err := as.Register("test@test.com", "user", "strongPass11")
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-			return
-		}
+	as := auth.NewService()
 
-		ur := repo.NewUserRepository()
+	res, err := as.Register("test@test.com", "user", "strongPass11")
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+		return
+	}
 
-		userFromDB, err := ur.Get(res.User.ID)
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-			return
-		}
+	ur := repo.NewUserRepository()
 
-		if res.User != userFromDB {
-			t.Errorf("got user %v, want %v", userFromDB, res.User)
-		}
+	userFromDB, err := ur.Get(res.User.ID)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+		return
+	}
 
-		userID, err := security.ValidateToken(res.Token)
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-			return
-		}
+	if res.User != userFromDB {
+		t.Errorf("got user %v, want %v", userFromDB, res.User)
+	}
 
-		if res.User.ID != userID {
-			t.Errorf("got userID %v, want %v", userID, res.User.ID)
-		}
-	})
+	userID, err := security.ValidateToken(res.Token)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+		return
+	}
+
+	if res.User.ID != userID {
+		t.Errorf("got userID %v, want %v", userID, res.User.ID)
+	}
 }

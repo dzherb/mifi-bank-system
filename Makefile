@@ -31,3 +31,10 @@ lint:
 .PHONY: fmt
 fmt:
 	@golangci-lint fmt ./...
+
+.PHONY: check
+check: lint cover check-coverage
+
+.PHONY: migrations
+migrations:
+	@./scripts/migrations.sh

@@ -30,7 +30,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestLogin(t *testing.T) {
-	storage.WithTransaction(t, func() {
+	storage.TestWithTransaction(t, func() {
 		ur := repo.NewUserRepository()
 		user, err := ur.Create(models.User{
 			Username: "test",
@@ -68,7 +68,7 @@ func TestLogin(t *testing.T) {
 }
 
 func TestRegister(t *testing.T) {
-	storage.WithTransaction(t, func() {
+	storage.TestWithTransaction(t, func() {
 		as := auth.NewService()
 
 		res, err := as.Register("test@test.com", "user", "strongPass11")

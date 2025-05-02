@@ -84,11 +84,11 @@ func WithMigratedDB(testRunner func() int) int {
 	return testRunner()
 }
 
-// WithTransaction runs the test function
+// TestWithTransaction runs the test function
 // within a rolled-back transaction.
 // Fails the test immediately if beginning
 // or rolling back the transaction fails.
-func WithTransaction(
+func TestWithTransaction(
 	t *testing.T,
 	test func(),
 ) {

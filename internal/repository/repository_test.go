@@ -38,7 +38,7 @@ func testUser() models.User {
 }
 
 func TestUserRepositoryImpl_Create(t *testing.T) {
-	storage.WithTransaction(t, func() {
+	storage.TestWithTransaction(t, func() {
 		now := time.Now().Add(-time.Second * 10)
 		ur := repo.NewUserRepository()
 
@@ -99,7 +99,7 @@ func TestUserConstraints(t *testing.T) {
 		},
 	}
 	for _, u := range users {
-		storage.WithTransaction(t, func() {
+		storage.TestWithTransaction(t, func() {
 			ur := repo.NewUserRepository()
 
 			_, err := ur.Create(firstUser)
@@ -122,7 +122,7 @@ func TestUserConstraints(t *testing.T) {
 }
 
 func TestUserRepositoryImpl_Authenticate(t *testing.T) {
-	storage.WithTransaction(t, func() {
+	storage.TestWithTransaction(t, func() {
 		ur := repo.NewUserRepository()
 
 		created, err := ur.Create(testUser())
@@ -143,7 +143,7 @@ func TestUserRepositoryImpl_Authenticate(t *testing.T) {
 }
 
 func TestUserRepositoryImpl_Authenticate2(t *testing.T) {
-	storage.WithTransaction(t, func() {
+	storage.TestWithTransaction(t, func() {
 		ur := repo.NewUserRepository()
 
 		created, err := ur.Create(testUser())
@@ -159,7 +159,7 @@ func TestUserRepositoryImpl_Authenticate2(t *testing.T) {
 }
 
 func TestUserRepositoryImpl_Get(t *testing.T) {
-	storage.WithTransaction(t, func() {
+	storage.TestWithTransaction(t, func() {
 		ur := repo.NewUserRepository()
 
 		created, err := ur.Create(testUser())
@@ -180,7 +180,7 @@ func TestUserRepositoryImpl_Get(t *testing.T) {
 }
 
 func TestAccountRepositoryImpl_Create(t *testing.T) {
-	storage.WithTransaction(t, func() {
+	storage.TestWithTransaction(t, func() {
 		now := time.Now().Add(-time.Second * 10)
 		ar := repo.NewAccountRepository()
 		ur := repo.NewUserRepository()
@@ -226,7 +226,7 @@ func TestAccountRepositoryImpl_Create(t *testing.T) {
 }
 
 func TestAccountRepositoryImpl_Get(t *testing.T) {
-	storage.WithTransaction(t, func() {
+	storage.TestWithTransaction(t, func() {
 		ar := repo.NewAccountRepository()
 		ur := repo.NewUserRepository()
 
@@ -254,7 +254,7 @@ func TestAccountRepositoryImpl_Get(t *testing.T) {
 }
 
 func TestAccountRepositoryImpl_Update(t *testing.T) {
-	storage.WithTransaction(t, func() {
+	storage.TestWithTransaction(t, func() {
 		ar := repo.NewAccountRepository()
 		ur := repo.NewUserRepository()
 

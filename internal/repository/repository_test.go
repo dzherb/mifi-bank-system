@@ -288,3 +288,58 @@ func TestAccountRepositoryImpl_Update(t *testing.T) {
 		t.Errorf("expected balance to be 100, got %v", updated.Balance)
 	}
 }
+
+func testAccount() (models.Account, error) {
+	ur := repo.NewUserRepository()
+	ar := repo.NewAccountRepository()
+
+	user, err := ur.Create(testUser())
+	if err != nil {
+		return models.Account{}, err
+	}
+
+	return ar.Create(models.Account{
+		UserID: user.ID,
+	})
+}
+
+func TestTransactionRepositoryImpl_Create(t *testing.T) {
+	storage.TestWithTransaction(t)
+
+	account, err := testAccount()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tr := repo.NewTransactionRepository()
+
+	transaction, err := tr.Create(models.Transaction{
+		ReceiverAccountID: &account.ID,
+		Type:              models.Deposit,
+		Amount:            decimal.NewFromInt(100),
+	})
+	if err != nil {
+		t.Errorf("error creating transaction: %v", err)
+		return
+	}
+
+	if *transaction.ReceiverAccountID != account.ID {
+		t.Errorf(
+			"expected receiver account id %d, got %d",
+			account.ID,
+			*transaction.ReceiverAccountID,
+		)
+	}
+
+	if transaction.Type != models.Deposit {
+		t.Errorf(
+			"expected transaction type %v, got %v",
+			models.Deposit,
+			transaction.Type,
+		)
+	}
+
+	if !transaction.Amount.Equal(decimal.NewFromInt(100)) {
+		t.Errorf("expected amount to be 100, got %v", transaction.Amount)
+	}
+}

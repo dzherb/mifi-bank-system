@@ -89,7 +89,7 @@ func TestTokenValidation(t *testing.T) {
 			"sub": c.token.sub,
 			"exp": c.token.exp,
 		}).
-			SignedString(security.SecretKey)
+			SignedString(*security.SecretKey)
 
 		if err != nil {
 			t.Error(err)

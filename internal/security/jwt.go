@@ -12,7 +12,7 @@ var secretKey []byte
 var accessTokenTTL time.Duration
 
 func Init(cfg *config.Config) {
-	secretKey = []byte(cfg.ServerPort)
+	secretKey = []byte(cfg.SecretKey)
 	accessTokenTTL = cfg.AccessTokenTTL
 }
 

@@ -34,8 +34,9 @@ func (ar *AccountRepositoryImpl) Get(id int) (models.Account, error) {
 		ar.db,
 		&account,
 		`SELECT id, user_id, balance, created_at, updated_at
-		 FROM accounts
-		 WHERE id = $1;`,
+		FROM accounts
+		WHERE id = $1
+		FOR UPDATE;`,
 		id,
 	)
 
@@ -54,8 +55,8 @@ func (ar *AccountRepositoryImpl) Create(
 		ar.db,
 		&account,
 		`INSERT INTO accounts (user_id, balance)
-		 VALUES ($1, $2)
-    	 RETURNING id, user_id, balance, created_at, updated_at;`,
+		VALUES ($1, $2)
+    	RETURNING id, user_id, balance, created_at, updated_at;`,
 		account.UserID,
 		account.Balance,
 	)

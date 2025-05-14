@@ -2,3 +2,5 @@
 ___
 
 # Banking system API
+
+## [Database schema](/database.md)

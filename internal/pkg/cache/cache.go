@@ -24,4 +24,5 @@ func Init() {
 
 func Close() {
 	cache.Stop()
+	cache = nil
 }

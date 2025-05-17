@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/dzherb/mifi-bank-system/internal/config"
+	"github.com/dzherb/mifi-bank-system/internal/pkg/cache"
 	"github.com/dzherb/mifi-bank-system/internal/security"
 	"github.com/dzherb/mifi-bank-system/internal/server"
 	"github.com/dzherb/mifi-bank-system/internal/storage"
@@ -14,6 +15,7 @@ func main() { // coverage-ignore
 
 	cfg := config.Load()
 
+	cache.Init()
 	security.Init(cfg)
 
 	closeConn, err := storage.Init(cfg)

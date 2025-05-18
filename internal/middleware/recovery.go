@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/dzherb/mifi-bank-system/internal/handlers"
+	"github.com/dzherb/mifi-bank-system/internal/pkg/responses"
 )
 
 type ctxKey string
@@ -22,7 +22,7 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
 				*r = *r.WithContext(ctx)
 
 				w.WriteHeader(http.StatusInternalServerError)
-				handlers.WriteErrorResponse(
+				responses.WriteError(
 					w,
 					fmt.Errorf("internal server error"),
 				)

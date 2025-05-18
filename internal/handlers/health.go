@@ -3,6 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+
+	http2 "github.com/dzherb/mifi-bank-system/internal/pkg/responses"
 )
 
 type HealthResponse struct {
@@ -14,7 +16,7 @@ var HealthHandler = http.HandlerFunc(
 		err := json.NewEncoder(w).Encode(HealthResponse{Status: "ok"})
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			WriteErrorResponse(w, err)
+			http2.WriteError(w, err)
 		}
 	},
 )

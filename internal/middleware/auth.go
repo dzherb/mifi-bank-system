@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/dzherb/mifi-bank-system/internal/handlers"
+	"github.com/dzherb/mifi-bank-system/internal/pkg/responses"
 	"github.com/dzherb/mifi-bank-system/internal/security"
 )
 
@@ -20,7 +20,7 @@ func AuthRequired(next http.Handler) http.Handler {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" || !strings.HasPrefix(authHeader, TokenPrefix) {
 			w.WriteHeader(http.StatusUnauthorized)
-			handlers.WriteErrorResponse(w, fmt.Errorf("token must be provided"))
+			responses.WriteError(w, fmt.Errorf("token must be provided"))
 
 			return
 		}
@@ -30,7 +30,7 @@ func AuthRequired(next http.Handler) http.Handler {
 		userID, err := security.ValidateToken(token)
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
-			handlers.WriteErrorResponse(w, err)
+			responses.WriteError(w, err)
 		}
 
 		r = r.WithContext(context.WithValue(r.Context(), UserIDKey, userID))

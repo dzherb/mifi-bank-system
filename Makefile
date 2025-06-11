@@ -16,7 +16,7 @@ install-go-test-coverage:
 check-coverage: install-go-test-coverage cover
 	@${GOBIN}/go-test-coverage --config=./.testcoverage.yml
 
-.PHONU: clean
+.PHONY: clean
 clean:
 	@rm -f cover.out
 

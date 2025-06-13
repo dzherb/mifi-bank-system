@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/dzherb/mifi-bank-system/internal/handlers"
+	"github.com/dzherb/mifi-bank-system/internal/pkg/responses"
 	log "github.com/sirupsen/logrus"
 	"github.com/throttled/throttled/v2"
 	"github.com/throttled/throttled/v2/store/memstore"
@@ -35,7 +35,7 @@ func RateLimiter() func(http.Handler) http.Handler {
 	return (&throttled.HTTPRateLimiterCtx{
 		DeniedHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusTooManyRequests)
-			handlers.WriteErrorResponse(w, fmt.Errorf("limit exceeded"))
+			responses.WriteError(w, fmt.Errorf("limit exceeded"))
 		}),
 		RateLimiter: rateLimiter,
 		VaryBy:      &throttled.VaryBy{Path: true},

@@ -1,3 +1,3 @@
-package cbr
+package bank
 
 var SetKeyRateProvider = setKeyRateProvider

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/dzherb/mifi-bank-system/internal/middleware"
-	"github.com/dzherb/mifi-bank-system/internal/pkg/responses"
 	"github.com/dzherb/mifi-bank-system/internal/repository"
+	"github.com/dzherb/mifi-bank-system/internal/server/middleware"
+	"github.com/dzherb/mifi-bank-system/internal/server/responses"
 )
 
 var CurrentUserHandler = http.HandlerFunc(

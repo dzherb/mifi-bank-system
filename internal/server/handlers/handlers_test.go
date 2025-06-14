@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/dzherb/mifi-bank-system/internal/config"
-	"github.com/dzherb/mifi-bank-system/internal/handlers"
+	"github.com/dzherb/mifi-bank-system/internal/server/handlers"
 	"github.com/dzherb/mifi-bank-system/internal/storage"
 	log "github.com/sirupsen/logrus"
 )

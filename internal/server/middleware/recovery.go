@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/dzherb/mifi-bank-system/internal/pkg/responses"
+	"github.com/dzherb/mifi-bank-system/internal/server/responses"
 )
 
 type ctxKey string

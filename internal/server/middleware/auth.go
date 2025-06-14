@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/dzherb/mifi-bank-system/internal/pkg/responses"
 	"github.com/dzherb/mifi-bank-system/internal/security"
+	"github.com/dzherb/mifi-bank-system/internal/server/responses"
 )
 
 type userIDCtxKey string

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/dzherb/mifi-bank-system/internal/pkg/responses"
+	"github.com/dzherb/mifi-bank-system/internal/server/responses"
 	log "github.com/sirupsen/logrus"
 	"github.com/throttled/throttled/v2"
 	"github.com/throttled/throttled/v2/store/memstore"

@@ -16,6 +16,11 @@ type Config struct {
 	DatabaseURL    string
 	SecretKey      string
 	AccessTokenTTL time.Duration
+
+	SMTPHost     string
+	SMTPPort     int
+	SMTPUsername string
+	SMTPPassword string
 }
 
 func Load() *Config {
@@ -27,6 +32,10 @@ func Load() *Config {
 		DatabaseURL:    envOrPanic("DATABASE_URL"),
 		SecretKey:      envOrPanic("SECRET_KEY"),
 		AccessTokenTTL: accessTokenTTL(),
+		SMTPHost:       envOrPanic("SMTP_HOST"),
+		SMTPPort:       envAndConvert("SMTP_PORT", strconv.Atoi),
+		SMTPUsername:   envOrPanic("SMTP_USERNAME"),
+		SMTPPassword:   envOrPanic("SMTP_PASSWORD"),
 	}
 }
 
@@ -56,6 +65,17 @@ func envOrDefault(key string, defaultVal string) string {
 	}
 
 	return defaultVal
+}
+
+func envAndConvert[T any](key string, convert func(val string) (T, error)) T {
+	val := envOrPanic(key)
+
+	res, err := convert(val)
+	if err != nil {
+		panic(err)
+	}
+
+	return res
 }
 
 func envOrPanic(key string) string {

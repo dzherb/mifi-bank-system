@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dzherb/mifi-bank-system/internal/notifications"
+	"github.com/dzherb/mifi-bank-system/internal/services/notifications"
 	"github.com/shopspring/decimal"
 )
 

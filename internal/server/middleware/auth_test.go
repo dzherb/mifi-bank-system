@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/dzherb/mifi-bank-system/internal/config"
-	"github.com/dzherb/mifi-bank-system/internal/middleware"
 	"github.com/dzherb/mifi-bank-system/internal/security"
+	"github.com/dzherb/mifi-bank-system/internal/server/middleware"
 )
 
 var handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

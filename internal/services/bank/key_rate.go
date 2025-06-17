@@ -3,7 +3,7 @@ package bank
 import (
 	"time"
 
-	"github.com/dzherb/mifi-bank-system/internal/pkg/cache"
+	"github.com/dzherb/mifi-bank-system/internal/cache"
 	"github.com/dzherb/mifi-bank-system/pkg/cbr"
 )
 

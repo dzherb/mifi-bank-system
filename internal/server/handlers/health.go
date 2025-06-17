@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	http2 "github.com/dzherb/mifi-bank-system/internal/pkg/responses"
+	http2 "github.com/dzherb/mifi-bank-system/internal/server/responses"
 )
 
 type HealthResponse struct {

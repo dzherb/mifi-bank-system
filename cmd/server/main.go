@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/dzherb/mifi-bank-system/internal/cache"
 	"github.com/dzherb/mifi-bank-system/internal/config"
-	"github.com/dzherb/mifi-bank-system/internal/pkg/cache"
 	"github.com/dzherb/mifi-bank-system/internal/security"
 	"github.com/dzherb/mifi-bank-system/internal/server"
 	"github.com/dzherb/mifi-bank-system/internal/storage"

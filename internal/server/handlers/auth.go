@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/dzherb/mifi-bank-system/internal/pkg/responses"
+	"github.com/dzherb/mifi-bank-system/internal/server/responses"
 	"github.com/dzherb/mifi-bank-system/internal/services/auth"
 )
 

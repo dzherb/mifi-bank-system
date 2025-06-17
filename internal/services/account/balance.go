@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/dzherb/mifi-bank-system/internal/models"
-	repo "github.com/dzherb/mifi-bank-system/internal/repository"
+	"github.com/dzherb/mifi-bank-system/internal/repository"
 	"github.com/dzherb/mifi-bank-system/internal/storage"
 	"github.com/jackc/pgx/v5"
 	"github.com/shopspring/decimal"

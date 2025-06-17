@@ -7,7 +7,7 @@ import (
 
 	"github.com/dzherb/mifi-bank-system/internal/config"
 	"github.com/dzherb/mifi-bank-system/internal/models"
-	repo "github.com/dzherb/mifi-bank-system/internal/repository"
+	"github.com/dzherb/mifi-bank-system/internal/repository"
 	"github.com/dzherb/mifi-bank-system/internal/services/account"
 	"github.com/dzherb/mifi-bank-system/internal/storage"
 	"github.com/jackc/pgx/v5"
@@ -243,5 +243,33 @@ func TestServiceImplBalance(t *testing.T) { //nolint:gocognit
 				)
 			}
 		})
+	}
+}
+
+func TestServiceImplCreate(t *testing.T) {
+	ur := repo.NewUserRepository()
+	user, err := ur.Create(models.User{
+		Email:    "test@test.com",
+		Username: "test",
+		Password: "123456",
+	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	service := account.NewService()
+
+	acc, err := service.Create(user.ID)
+	if err != nil {
+		t.Errorf("failed to create account: %v", err)
+	}
+
+	if acc.UserID != user.ID {
+		t.Errorf("expected user ID %v, got %v", user.ID, acc.UserID)
+	}
+
+	if !acc.Balance.IsZero() {
+		t.Errorf("expected balance %v, got %v", 0, acc.Balance)
 	}
 }

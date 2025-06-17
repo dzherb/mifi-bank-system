@@ -28,10 +28,6 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
           POSTGRES_DB: test_db
-          SMTP_HOST: smtp.example.com
-          SMTP_PORT: 587
-          SMTP_USERNAME: noreply@test.com
-          SMTP_PASSWORD: password
         ports:
           - 5432:5432
         options: >-
@@ -50,6 +46,10 @@ jobs:
         env:
           SECRET_KEY: not_secret
           DATABASE_URL: postgres://postgres:password@localhost:5432/test_db?sslmode=disable
+          SMTP_HOST: smtp.example.com
+          SMTP_PORT: 587
+          SMTP_USERNAME: noreply@test.com
+          SMTP_PASSWORD: password
         run: make cover
       - name: Upload coverage data
         uses: actions/upload-artifact@v4

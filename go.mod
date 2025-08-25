@@ -3,7 +3,7 @@ module github.com/dzherb/mifi-bank-system
 go 1.24.1
 
 require (
-	github.com/beevik/etree v1.5.1
+	github.com/beevik/etree v1.6.0
 	github.com/georgysavva/scany/v2 v2.1.4
 	github.com/go-mail/mail/v2 v2.3.0
 	github.com/golang-jwt/jwt/v5 v5.3.0

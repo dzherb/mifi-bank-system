@@ -17,7 +17,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/shopspring/decimal v1.4.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/throttled/throttled/v2 v2.13.0
+	github.com/throttled/throttled/v2 v2.15.0
 )
 
 require (

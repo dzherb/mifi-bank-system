@@ -52,7 +52,7 @@ jobs:
           SMTP_PASSWORD: password
         run: make cover
       - name: Upload coverage data
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: cover.out
           path: cover.out
